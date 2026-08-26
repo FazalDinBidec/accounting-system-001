@@ -25,7 +25,7 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 ## Verification Scripts
 
-- Do not create verification scripts or tinker when tests cover that functionality and prove they work. Unit and feature tests are more important.
+- Do not create verification scripts unless the user asks.
 
 ## Application Structure & Architecture
 
@@ -83,7 +83,7 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 ## Tinker
 
-- Execute PHP in app context for debugging and testing code. Do not create models without user approval, prefer tests with factories instead. Prefer existing Artisan commands over custom tinker code.
+- Execute PHP in app context for debugging. Do not create models without user approval. Prefer existing Artisan commands over custom tinker code.
 - Always use single quotes to prevent shell expansion: `php artisan tinker --execute 'Your::code();'`
   - Double quotes for PHP strings inside: `php artisan tinker --execute 'User::where("active", true)->count();'`
 
@@ -106,12 +106,10 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 === tests rules ===
 
-# Test Enforcement
+# Tests
 
-- Test every code change by adding or updating a test.
-- Run the affected tests and ensure they pass.
-- Test the changed behavior and its important failure modes, but do not add tests beyond them.
-- Read the `testing-best-practices` skill before writing tests.
+- Do not add, update, or run tests unless the user explicitly asks.
+- Do not create Form Request classes. Validate inline with `$request->validate()`.
 
 === inertia-laravel/core rules ===
 
@@ -158,9 +156,7 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 ## Testing
 
-- When creating models for tests, use the factories for the models. Check if the factory has custom states that can be used before manually setting up the model.
-- Faker: Use methods such as `$this->faker->word()` or `fake()->randomDigit()`. Follow existing conventions whether to use `$this->faker` or `fake()`.
-- When creating tests, make use of `php artisan make:test [options] {name}` to create a feature test, and pass `--unit` to create a unit test. Most tests should be feature tests.
+- Do not create tests unless the user explicitly asks.
 
 ## Vite Error
 
@@ -183,17 +179,8 @@ Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `
 
 # Pest
 
-- This project uses Pest. Create tests with `php artisan make:test --pest {name}`.
-- Do not include the test suite directory in `{name}`. Use `SomeFeatureTest`, not `Feature/SomeFeatureTest`.
-- Read the `testing-best-practices` skill for guidance on coverage, naming, structure, dependency isolation, and review.
-- Do not delete tests or test files without approval. They are part of the application.
-
-## Running Tests
-
-- Run the narrowest set of tests that covers the change. Pass a file path or `--filter=testName` to `php artisan test --compact`.
-- Rerun a test after each change to it.
-- Run `vendor/bin/pest` to call the test runner directly. It accepts the same file path and `--filter=testName` arguments.
-- After the feature tests pass, ask the user to run the complete suite with `php artisan test --compact`.
+- Do not create, update, or run Pest tests unless the user explicitly asks.
+- Do not delete existing tests or test files without approval.
 
 === inertia-react/core rules ===
 

@@ -61,19 +61,23 @@ public function store(Request $request)
 
 Correct:
 ```php
-public function store(StorePostRequest $request, CreatePostAction $create)
+public function store(Request $request, CreatePostAction $create)
 {
-    $post = $create->execute($request->validated());
+    $validated = $request->validate([
+        'title' => ['required', 'max:255'],
+        'body' => ['required'],
+    ]);
+
+    $post = $create->execute($validated);
 
     return redirect()->route('posts.show', $post);
 }
 ```
 
-## Type-Hint Form Requests
+## Validate Inline
 
-Type-hinting Form Requests triggers automatic validation and authorization before the method executes.
+Validate on `Request` in the controller. Do not type-hint Form Request classes.
 
-Incorrect:
 ```php
 public function store(Request $request): RedirectResponse
 {
@@ -83,16 +87,6 @@ public function store(Request $request): RedirectResponse
     ]);
 
     Post::create($validated);
-
-    return redirect()->route('posts.index');
-}
-```
-
-Correct:
-```php
-public function store(StorePostRequest $request): RedirectResponse
-{
-    Post::create($request->validated());
 
     return redirect()->route('posts.index');
 }

@@ -40,20 +40,16 @@ public function update(UpdatePostRequest $request, Post $post)
 
 Correct:
 ```php
-public function update(UpdatePostRequest $request, Post $post)
+public function update(Request $request, Post $post)
 {
     Gate::authorize('update', $post);
 
-    $post->update($request->validated());
-}
-```
+    $validated = $request->validate([
+        'title' => ['required', 'max:255'],
+        'body' => ['required'],
+    ]);
 
-Or via Form Request:
-
-```php
-public function authorize(): bool
-{
-    return $this->user()->can('update', $this->route('post'));
+    $post->update($validated);
 }
 ```
 

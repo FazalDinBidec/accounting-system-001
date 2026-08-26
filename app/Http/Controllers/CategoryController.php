@@ -20,14 +20,8 @@ class CategoryController extends Controller
             'categories' => Category::query()
                 ->with('parent:id,name')
                 ->latest()
-                ->paginate(15)
+                ->paginate(10)
                 ->withQueryString(),
-        ]);
-    }
-
-    public function create(): Response
-    {
-        return Inertia::render('categories/create', [
             'parents' => $this->parentOptions(),
         ]);
     }
@@ -38,15 +32,7 @@ class CategoryController extends Controller
 
         Toast::success(__('Category created.'));
 
-        return to_route('categories.index');
-    }
-
-    public function edit(Category $category): Response
-    {
-        return Inertia::render('categories/edit', [
-            'category' => $category,
-            'parents' => $this->parentOptions($category),
-        ]);
+        return back();
     }
 
     public function update(Request $request, Category $category): RedirectResponse
@@ -55,7 +41,20 @@ class CategoryController extends Controller
 
         Toast::success(__('Category updated.'));
 
-        return to_route('categories.index');
+        return back();
+    }
+
+    public function toggleStatus(Category $category): RedirectResponse
+    {
+        $category->update([
+            'status' => $category->status === CategoryStatus::Active
+                ? CategoryStatus::Inactive
+                : CategoryStatus::Active,
+        ]);
+
+        Toast::success(__('Category status updated.'));
+
+        return back();
     }
 
     public function destroy(Category $category): RedirectResponse
@@ -94,10 +93,9 @@ class CategoryController extends Controller
         return $validated;
     }
 
-    private function parentOptions(?Category $except = null): Collection
+    private function parentOptions(): Collection
     {
         return Category::query()
-            ->when($except, fn ($query, Category $except) => $query->whereKeyNot($except->id))
             ->orderBy('name')
             ->get(['id', 'name']);
     }

@@ -1,32 +1,60 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Form, Head } from '@inertiajs/react';
 import { Pencil, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import CategoryController from '@/actions/App/Http/Controllers/CategoryController';
 import Heading from '@/components/heading';
 import Pagination from '@/components/pagination';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import type { PaginatedCategories } from '@/pages/categories/types';
+import { Switch } from '@/components/ui/switch';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import CategoryFormDialog from '@/pages/categories/category-form-dialog';
+import type {
+    Category,
+    CategoryParentOption,
+    PaginatedCategories,
+} from '@/pages/categories/types';
 
 export default function CategoriesIndex({
     categories,
+    parents,
 }: {
     categories: PaginatedCategories;
+    parents: CategoryParentOption[];
 }) {
+    const [dialogCategory, setDialogCategory] = useState<Category | null>(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [dialogKey, setDialogKey] = useState(0);
+
+    function openCreate(): void {
+        setDialogCategory(null);
+        setDialogKey((key) => key + 1);
+        setDialogOpen(true);
+    }
+
+    function openEdit(category: Category): void {
+        setDialogCategory(category);
+        setDialogKey((key) => key + 1);
+        setDialogOpen(true);
+    }
+
     return (
         <>
             <Head title="Categories" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded p-4">
                 <div className="flex items-start justify-between gap-4">
                     <Heading
                         title="Categories"
                         description="Manage categories"
                     />
-                    <Button asChild>
-                        <Link href={CategoryController.create()}>
-                            Add category
-                        </Link>
-                    </Button>
+                    <Button onClick={openCreate}>Add category</Button>
                 </div>
 
                 <div className="overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
@@ -36,65 +64,69 @@ export default function CategoriesIndex({
                         </p>
                     ) : (
                         <>
-                            <table className="w-full text-left text-sm">
-                                <thead className="border-b bg-muted/40">
-                                    <tr>
-                                        <th className="px-4 py-3 font-medium">
-                                            Name
-                                        </th>
-                                        <th className="px-4 py-3 font-medium">
-                                            Parent
-                                        </th>
-                                        <th className="px-4 py-3 font-medium">
-                                            Status
-                                        </th>
-                                        <th className="px-4 py-3 font-medium">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Name</TableHead>
+                                        <TableHead>Parent</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="text-center">
                                             Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
                                     {categories.data.map((category) => (
-                                        <tr
-                                            key={category.id}
-                                            className="border-b last:border-0"
-                                        >
-                                            <td className="px-4 py-3">
+                                        <TableRow key={category.id}>
+                                            <TableCell>
                                                 {category.name}
-                                            </td>
-                                            <td className="px-4 py-3">
+                                            </TableCell>
+                                            <TableCell>
                                                 {category.parent?.name ?? '—'}
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <Badge
-                                                    variant={
-                                                        category.status ===
-                                                        'active'
-                                                            ? 'default'
-                                                            : 'secondary'
-                                                    }
+                                            </TableCell>
+                                            <TableCell>
+                                                <Form
+                                                    {...CategoryController.toggleStatus.form(
+                                                        category,
+                                                    )}
+                                                    options={{
+                                                        preserveScroll: true,
+                                                    }}
                                                 >
-                                                    {category.status}
-                                                </Badge>
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <div className="flex flex-wrap items-center gap-2">
+                                                    {({
+                                                        processing,
+                                                        submit,
+                                                    }) => (
+                                                        <Switch
+                                                            checked={
+                                                                category.status ===
+                                                                'active'
+                                                            }
+                                                            disabled={
+                                                                processing
+                                                            }
+                                                            onCheckedChange={() =>
+                                                                submit()
+                                                            }
+                                                            aria-label={`Toggle status for ${category.name}`}
+                                                        />
+                                                    )}
+                                                </Form>
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                <div className="flex flex-wrap items-center justify-center gap-2">
                                                     <Button
                                                         variant="outline"
                                                         size="icon"
                                                         className="size-8"
-                                                        asChild
+                                                        onClick={() =>
+                                                            openEdit(category)
+                                                        }
                                                     >
-                                                        <Link
-                                                            href={CategoryController.edit(
-                                                                category,
-                                                            )}
-                                                        >
-                                                            <Pencil />
-                                                            <span className="sr-only">
-                                                                Edit
-                                                            </span>
-                                                        </Link>
+                                                        <Pencil />
+                                                        <span className="sr-only">
+                                                            Edit
+                                                        </span>
                                                     </Button>
                                                     <Form
                                                         {...CategoryController.destroy.form(
@@ -127,11 +159,11 @@ export default function CategoriesIndex({
                                                         )}
                                                     </Form>
                                                 </div>
-                                            </td>
-                                        </tr>
+                                            </TableCell>
+                                        </TableRow>
                                     ))}
-                                </tbody>
-                            </table>
+                                </TableBody>
+                            </Table>
                             <Pagination
                                 links={categories.links}
                                 from={categories.from}
@@ -143,6 +175,14 @@ export default function CategoriesIndex({
                     )}
                 </div>
             </div>
+
+            <CategoryFormDialog
+                key={dialogKey}
+                category={dialogCategory ?? undefined}
+                parents={parents}
+                open={dialogOpen}
+                onOpenChange={setDialogOpen}
+            />
         </>
     );
 }

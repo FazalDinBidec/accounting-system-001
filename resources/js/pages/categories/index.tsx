@@ -49,15 +49,12 @@ export default function CategoriesIndex({
             <Head title="Categories" />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded p-4">
-                <div className="flex items-start justify-between gap-4">
-                    <Heading
-                        title="Categories"
-                        description="Manage categories"
-                    />
+                <div className="flex items-start justify-between gap-4 rounded border p-4">
+                    <Heading title="Categories" />
                     <Button onClick={openCreate}>Add category</Button>
                 </div>
 
-                <div className="overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                <div className="overflow-hidden rounded border border-sidebar-border/70 dark:border-sidebar-border">
                     {categories.data.length === 0 ? (
                         <p className="p-6 text-sm text-muted-foreground">
                             No categories yet.

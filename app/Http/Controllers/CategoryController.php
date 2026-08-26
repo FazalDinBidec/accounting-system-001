@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\CategoryStatus;
 use App\Models\Category;
+use App\Toast;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -35,7 +36,7 @@ class CategoryController extends Controller
     {
         Category::query()->create($this->validatedAttributes($request));
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Category created.')]);
+        Toast::success(__('Category created.'));
 
         return to_route('categories.index');
     }
@@ -52,7 +53,7 @@ class CategoryController extends Controller
     {
         $category->update($this->validatedAttributes($request, $category));
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Category updated.')]);
+        Toast::success(__('Category updated.'));
 
         return to_route('categories.index');
     }
@@ -60,21 +61,18 @@ class CategoryController extends Controller
     public function destroy(Category $category): RedirectResponse
     {
         if ($category->children()->exists()) {
-            Inertia::flash('toast', [
-                'type' => 'error',
-                'message' => __('Delete child categories first.'),
-            ]);
+            Toast::error(__('Delete child categories first.'));
 
             return back();
         }
 
         $category->delete();
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Category deleted.')]);
+        Toast::success(__('Category deleted.'));
 
         return to_route('categories.index');
     }
-    
+
     private function validatedAttributes(Request $request, ?Category $category = null): array
     {
         $request->merge([
@@ -95,7 +93,7 @@ class CategoryController extends Controller
 
         return $validated;
     }
- 
+
     private function parentOptions(?Category $except = null): Collection
     {
         return Category::query()

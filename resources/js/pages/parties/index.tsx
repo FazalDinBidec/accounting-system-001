@@ -1,7 +1,7 @@
 import { Form, Head } from '@inertiajs/react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import CategoryController from '@/actions/App/Http/Controllers/CategoryController';
+import PartyController from '@/actions/App/Http/Controllers/PartyController';
 import DeleteDialog from '@/components/delete-dialog';
 import Heading from '@/components/heading';
 import Pagination from '@/components/pagination';
@@ -15,60 +15,54 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import CategoryFormDialog from '@/pages/categories/category-form-dialog';
-import type {
-    Category,
-    CategoryParentOption,
-    PaginatedCategories,
-} from '@/pages/categories/types';
+import PartyFormDialog from '@/pages/parties/party-form-dialog';
+import type { PaginatedParties, Party } from '@/pages/parties/types';
 
-export default function CategoriesIndex({
-    categories,
-    parents,
+export default function PartiesIndex({
+    parties,
 }: {
-    categories: PaginatedCategories;
-    parents: CategoryParentOption[];
+    parties: PaginatedParties;
 }) {
-    const [dialogCategory, setDialogCategory] = useState<Category | null>(null);
+    const [dialogParty, setDialogParty] = useState<Party | null>(null);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogKey, setDialogKey] = useState(0);
-    const [deleteCategory, setDeleteCategory] = useState<Category | null>(null);
+    const [deleteParty, setDeleteParty] = useState<Party | null>(null);
     const [deleteOpen, setDeleteOpen] = useState(false);
 
     function openCreate(): void {
-        setDialogCategory(null);
+        setDialogParty(null);
         setDialogKey((key) => key + 1);
         setDialogOpen(true);
     }
 
-    function openEdit(category: Category): void {
-        setDialogCategory(category);
+    function openEdit(party: Party): void {
+        setDialogParty(party);
         setDialogKey((key) => key + 1);
         setDialogOpen(true);
     }
 
-    function openDelete(category: Category): void {
-        setDeleteCategory(category);
+    function openDelete(party: Party): void {
+        setDeleteParty(party);
         setDeleteOpen(true);
     }
 
     return (
         <>
-            <Head title="Categories" />
+            <Head title="Parties" />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded p-4">
                 <div className="flex items-start justify-between gap-4 rounded border p-4">
-                    <Heading title="Categories" />
+                    <Heading title="Parties" />
                     <Button onClick={openCreate}>
                         <Plus />
-                        Add category
+                        Add party
                     </Button>
                 </div>
 
                 <div className="overflow-hidden rounded border border-sidebar-border/70 dark:border-sidebar-border">
-                    {categories.data.length === 0 ? (
+                    {parties.data.length === 0 ? (
                         <p className="p-6 text-sm text-muted-foreground">
-                            No categories yet.
+                            No parties yet.
                         </p>
                     ) : (
                         <>
@@ -76,7 +70,8 @@ export default function CategoriesIndex({
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Name</TableHead>
-                                        <TableHead>Parent</TableHead>
+                                        <TableHead>Phone</TableHead>
+                                        <TableHead>Address</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead className="text-center">
                                             Actions
@@ -84,18 +79,21 @@ export default function CategoriesIndex({
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {categories.data.map((category) => (
-                                        <TableRow key={category.id}>
+                                    {parties.data.map((party) => (
+                                        <TableRow key={party.id}>
+                                            <TableCell>{party.name}</TableCell>
                                             <TableCell>
-                                                {category.name}
+                                                {party.phone ?? '—'}
                                             </TableCell>
-                                            <TableCell>
-                                                {category.parent?.name ?? '—'}
+                                            <TableCell className="max-w-md">
+                                                <span className="line-clamp-2">
+                                                    {party.address ?? '—'}
+                                                </span>
                                             </TableCell>
                                             <TableCell>
                                                 <Form
-                                                    {...CategoryController.toggleStatus.form(
-                                                        category,
+                                                    {...PartyController.toggleStatus.form(
+                                                        party,
                                                     )}
                                                     options={{
                                                         preserveScroll: true,
@@ -107,8 +105,7 @@ export default function CategoriesIndex({
                                                     }) => (
                                                         <Switch
                                                             checked={
-                                                                category.status ===
-                                                                'active'
+                                                                party.is_active
                                                             }
                                                             disabled={
                                                                 processing
@@ -116,7 +113,7 @@ export default function CategoriesIndex({
                                                             onCheckedChange={() =>
                                                                 submit()
                                                             }
-                                                            aria-label={`Toggle status for ${category.name}`}
+                                                            aria-label={`Toggle status for ${party.name}`}
                                                         />
                                                     )}
                                                 </Form>
@@ -128,7 +125,7 @@ export default function CategoriesIndex({
                                                         size="icon"
                                                         className="size-8"
                                                         onClick={() =>
-                                                            openEdit(category)
+                                                            openEdit(party)
                                                         }
                                                     >
                                                         <Pencil />
@@ -141,7 +138,7 @@ export default function CategoriesIndex({
                                                         size="icon"
                                                         className="size-8"
                                                         onClick={() =>
-                                                            openDelete(category)
+                                                            openDelete(party)
                                                         }
                                                     >
                                                         <Trash2 />
@@ -156,21 +153,20 @@ export default function CategoriesIndex({
                                 </TableBody>
                             </Table>
                             <Pagination
-                                links={categories.links}
-                                from={categories.from}
-                                to={categories.to}
-                                total={categories.total}
-                                lastPage={categories.last_page}
+                                links={parties.links}
+                                from={parties.from}
+                                to={parties.to}
+                                total={parties.total}
+                                lastPage={parties.last_page}
                             />
                         </>
                     )}
                 </div>
             </div>
 
-            <CategoryFormDialog
+            <PartyFormDialog
                 key={dialogKey}
-                category={dialogCategory ?? undefined}
-                parents={parents}
+                party={dialogParty ?? undefined}
                 open={dialogOpen}
                 onOpenChange={setDialogOpen}
             />
@@ -178,15 +174,15 @@ export default function CategoriesIndex({
             <DeleteDialog
                 open={deleteOpen}
                 onOpenChange={setDeleteOpen}
-                title="Delete category"
+                title="Delete party"
                 description={
-                    deleteCategory
-                        ? `Delete ${deleteCategory.name}? This cannot be undone.`
+                    deleteParty
+                        ? `Delete ${deleteParty.name}? This cannot be undone.`
                         : 'This cannot be undone.'
                 }
                 action={
-                    deleteCategory
-                        ? CategoryController.destroy.form(deleteCategory)
+                    deleteParty
+                        ? PartyController.destroy.form(deleteParty)
                         : undefined
                 }
             />
@@ -194,11 +190,11 @@ export default function CategoriesIndex({
     );
 }
 
-CategoriesIndex.layout = {
+PartiesIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Categories',
-            href: CategoryController.index(),
+            title: 'Parties',
+            href: PartyController.index(),
         },
     ],
 };

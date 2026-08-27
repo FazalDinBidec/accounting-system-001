@@ -1,7 +1,7 @@
 import { Form, Head } from '@inertiajs/react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import CategoryController from '@/actions/App/Http/Controllers/CategoryController';
+import ProductController from '@/actions/App/Http/Controllers/ProductController';
 import DeleteDialog from '@/components/delete-dialog';
 import Heading from '@/components/heading';
 import Pagination from '@/components/pagination';
@@ -15,60 +15,54 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import CategoryFormDialog from '@/pages/categories/category-form-dialog';
-import type {
-    Category,
-    CategoryParentOption,
-    PaginatedCategories,
-} from '@/pages/categories/types';
+import ProductFormDialog from '@/pages/products/product-form-dialog';
+import type { PaginatedProducts, Product } from '@/pages/products/types';
 
-export default function CategoriesIndex({
-    categories,
-    parents,
+export default function ProductsIndex({
+    products,
 }: {
-    categories: PaginatedCategories;
-    parents: CategoryParentOption[];
+    products: PaginatedProducts;
 }) {
-    const [dialogCategory, setDialogCategory] = useState<Category | null>(null);
+    const [dialogProduct, setDialogProduct] = useState<Product | null>(null);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogKey, setDialogKey] = useState(0);
-    const [deleteCategory, setDeleteCategory] = useState<Category | null>(null);
+    const [deleteProduct, setDeleteProduct] = useState<Product | null>(null);
     const [deleteOpen, setDeleteOpen] = useState(false);
 
     function openCreate(): void {
-        setDialogCategory(null);
+        setDialogProduct(null);
         setDialogKey((key) => key + 1);
         setDialogOpen(true);
     }
 
-    function openEdit(category: Category): void {
-        setDialogCategory(category);
+    function openEdit(product: Product): void {
+        setDialogProduct(product);
         setDialogKey((key) => key + 1);
         setDialogOpen(true);
     }
 
-    function openDelete(category: Category): void {
-        setDeleteCategory(category);
+    function openDelete(product: Product): void {
+        setDeleteProduct(product);
         setDeleteOpen(true);
     }
 
     return (
         <>
-            <Head title="Categories" />
+            <Head title="Products" />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded p-4">
                 <div className="flex items-start justify-between gap-4 rounded border p-4">
-                    <Heading title="Categories" />
+                    <Heading title="Products" />
                     <Button onClick={openCreate}>
                         <Plus />
-                        Add category
+                        Add product
                     </Button>
                 </div>
 
                 <div className="overflow-hidden rounded border border-sidebar-border/70 dark:border-sidebar-border">
-                    {categories.data.length === 0 ? (
+                    {products.data.length === 0 ? (
                         <p className="p-6 text-sm text-muted-foreground">
-                            No categories yet.
+                            No products yet.
                         </p>
                     ) : (
                         <>
@@ -76,7 +70,7 @@ export default function CategoriesIndex({
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Name</TableHead>
-                                        <TableHead>Parent</TableHead>
+                                        <TableHead>Description</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead className="text-center">
                                             Actions
@@ -84,18 +78,20 @@ export default function CategoriesIndex({
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {categories.data.map((category) => (
-                                        <TableRow key={category.id}>
+                                    {products.data.map((product) => (
+                                        <TableRow key={product.id}>
                                             <TableCell>
-                                                {category.name}
+                                                {product.name}
                                             </TableCell>
-                                            <TableCell>
-                                                {category.parent?.name ?? '—'}
+                                            <TableCell className="max-w-md">
+                                                <span className="line-clamp-2">
+                                                    {product.description ?? '—'}
+                                                </span>
                                             </TableCell>
                                             <TableCell>
                                                 <Form
-                                                    {...CategoryController.toggleStatus.form(
-                                                        category,
+                                                    {...ProductController.toggleStatus.form(
+                                                        product,
                                                     )}
                                                     options={{
                                                         preserveScroll: true,
@@ -107,8 +103,7 @@ export default function CategoriesIndex({
                                                     }) => (
                                                         <Switch
                                                             checked={
-                                                                category.status ===
-                                                                'active'
+                                                                product.is_active
                                                             }
                                                             disabled={
                                                                 processing
@@ -116,7 +111,7 @@ export default function CategoriesIndex({
                                                             onCheckedChange={() =>
                                                                 submit()
                                                             }
-                                                            aria-label={`Toggle status for ${category.name}`}
+                                                            aria-label={`Toggle status for ${product.name}`}
                                                         />
                                                     )}
                                                 </Form>
@@ -128,7 +123,7 @@ export default function CategoriesIndex({
                                                         size="icon"
                                                         className="size-8"
                                                         onClick={() =>
-                                                            openEdit(category)
+                                                            openEdit(product)
                                                         }
                                                     >
                                                         <Pencil />
@@ -141,7 +136,7 @@ export default function CategoriesIndex({
                                                         size="icon"
                                                         className="size-8"
                                                         onClick={() =>
-                                                            openDelete(category)
+                                                            openDelete(product)
                                                         }
                                                     >
                                                         <Trash2 />
@@ -156,21 +151,20 @@ export default function CategoriesIndex({
                                 </TableBody>
                             </Table>
                             <Pagination
-                                links={categories.links}
-                                from={categories.from}
-                                to={categories.to}
-                                total={categories.total}
-                                lastPage={categories.last_page}
+                                links={products.links}
+                                from={products.from}
+                                to={products.to}
+                                total={products.total}
+                                lastPage={products.last_page}
                             />
                         </>
                     )}
                 </div>
             </div>
 
-            <CategoryFormDialog
+            <ProductFormDialog
                 key={dialogKey}
-                category={dialogCategory ?? undefined}
-                parents={parents}
+                product={dialogProduct ?? undefined}
                 open={dialogOpen}
                 onOpenChange={setDialogOpen}
             />
@@ -178,15 +172,15 @@ export default function CategoriesIndex({
             <DeleteDialog
                 open={deleteOpen}
                 onOpenChange={setDeleteOpen}
-                title="Delete category"
+                title="Delete product"
                 description={
-                    deleteCategory
-                        ? `Delete ${deleteCategory.name}? This cannot be undone.`
+                    deleteProduct
+                        ? `Delete ${deleteProduct.name}? This cannot be undone.`
                         : 'This cannot be undone.'
                 }
                 action={
-                    deleteCategory
-                        ? CategoryController.destroy.form(deleteCategory)
+                    deleteProduct
+                        ? ProductController.destroy.form(deleteProduct)
                         : undefined
                 }
             />
@@ -194,11 +188,11 @@ export default function CategoriesIndex({
     );
 }
 
-CategoriesIndex.layout = {
+ProductsIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Categories',
-            href: CategoryController.index(),
+            title: 'Products',
+            href: ProductController.index(),
         },
     ],
 };

@@ -13,10 +13,10 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         User::query()->firstOrCreate(
-            ['email' => 'admin@bidesol.com'],
+            ['email' => 'admin@bidecsol.com'],
             [
                 'name' => 'Admin',
-                'password' => 'admin@bidesol.com',
+                'password' => 'admin@bidecsol.com',
             ],
         );
     }

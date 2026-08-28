@@ -61,4 +61,12 @@ class Account extends Model
     {
         return $this->hasMany(self::class, 'parent_id');
     }
+
+    /**
+     * @return HasMany<JournalEntryLine, $this>
+     */
+    public function journalEntryLines(): HasMany
+    {
+        return $this->hasMany(JournalEntryLine::class);
+    }
 }

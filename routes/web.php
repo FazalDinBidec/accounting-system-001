@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PartyController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PurchaseOrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -31,6 +32,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::patch('/{product}/toggle-status', 'toggleStatus')->name('toggleStatus');
             Route::put('/{product}', 'update')->name('update');
             Route::delete('/{product}', 'destroy')->name('destroy');
+        });
+
+    Route::prefix('purchases')
+        ->name('purchases.')
+        ->controller(PurchaseOrderController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{purchaseOrder}/edit', 'edit')->name('edit');
+            Route::put('/{purchaseOrder}', 'update')->name('update');
+            Route::delete('/{purchaseOrder}', 'destroy')->name('destroy');
         });
 
     Route::prefix('parties')

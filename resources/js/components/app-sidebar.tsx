@@ -5,6 +5,7 @@ import {
     Landmark,
     LayoutGrid,
     Package,
+    ShoppingCart,
     Tags,
     Users,
 } from 'lucide-react';
@@ -26,6 +27,7 @@ import { index as accounts } from '@/routes/accounts';
 import { index as categories } from '@/routes/categories';
 import { index as parties } from '@/routes/parties';
 import { index as products } from '@/routes/products';
+import { index as purchases } from '@/routes/purchases';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -43,6 +45,11 @@ const mainNavItems: NavItem[] = [
         title: 'Products',
         href: products(),
         icon: Package,
+    },
+    {
+        title: 'Purchases',
+        href: purchases(),
+        icon: ShoppingCart,
     },
     {
         title: 'Parties',

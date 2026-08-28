@@ -1,10 +1,8 @@
+import FormSelect from '@/components/form-select';
 import InputError from '@/components/input-error';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { Category, CategoryParentOption } from '@/pages/categories/types';
-
-const selectClassName =
-    'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30';
 
 export default function CategoryFormFields({
     category,
@@ -32,33 +30,32 @@ export default function CategoryFormFields({
 
             <div className="grid gap-2">
                 <Label htmlFor="parent_id">Parent</Label>
-                <select
+                <FormSelect
                     id="parent_id"
                     name="parent_id"
-                    defaultValue={category?.parent_id ?? ''}
-                    className={selectClassName}
-                >
-                    <option value="">None</option>
-                    {parents.map((parent) => (
-                        <option key={parent.id} value={parent.id}>
-                            {parent.name}
-                        </option>
-                    ))}
-                </select>
+                    defaultValue={
+                        category?.parent_id ? String(category.parent_id) : ''
+                    }
+                    emptyLabel="None"
+                    options={parents.map((parent) => ({
+                        value: String(parent.id),
+                        label: parent.name,
+                    }))}
+                />
                 <InputError message={errors.parent_id} />
             </div>
 
             <div className="grid gap-2">
                 <Label htmlFor="status">Status</Label>
-                <select
+                <FormSelect
                     id="status"
                     name="status"
                     defaultValue={category?.status ?? 'active'}
-                    className={selectClassName}
-                >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                </select>
+                    options={[
+                        { value: 'active', label: 'Active' },
+                        { value: 'inactive', label: 'Inactive' },
+                    ]}
+                />
                 <InputError message={errors.status} />
             </div>
         </>

@@ -12,13 +12,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $journal_entry_id
  * @property int $account_id
+ * @property int|null $party_id
  * @property string $debit
  * @property string $credit
  * @property string|null $narration
  * @property-read JournalEntry $journalEntry
  * @property-read Account $account
+ * @property-read Party|null $party
  */
-#[Fillable(['journal_entry_id', 'account_id', 'debit', 'credit', 'narration'])]
+#[Fillable(['journal_entry_id', 'account_id', 'party_id', 'debit', 'credit', 'narration'])]
 class JournalEntryLine extends Model
 {
     /** @use HasFactory<JournalEntryLineFactory> */
@@ -42,6 +44,7 @@ class JournalEntryLine extends Model
         return [
             'journal_entry_id' => 'integer',
             'account_id' => 'integer',
+            'party_id' => 'integer',
             'debit' => 'decimal:2',
             'credit' => 'decimal:2',
         ];
@@ -61,5 +64,13 @@ class JournalEntryLine extends Model
     public function account(): BelongsTo
     {
         return $this->belongsTo(Account::class);
+    }
+
+    /**
+     * @return BelongsTo<Party, $this>
+     */
+    public function party(): BelongsTo
+    {
+        return $this->belongsTo(Party::class);
     }
 }

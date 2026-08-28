@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('debit', 15, 2)->default(0);
             $table->decimal('credit', 15, 2)->default(0);
             $table->text('narration')->nullable();
+            $table->foreignId('party_id')->nullable()->index()->constrained()->nullOnDelete();
         });
     }
 

@@ -16,11 +16,11 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AccountFormDialog from '@/pages/accounts/account-form-dialog';
-import {
-    accountTypeLabels,
-    type Account,
-    type AccountParentOption,
-    type PaginatedAccounts,
+import { accountTypeLabels } from '@/pages/accounts/types';
+import type {
+    Account,
+    AccountParentOption,
+    PaginatedAccounts,
 } from '@/pages/accounts/types';
 
 export default function AccountsIndex({

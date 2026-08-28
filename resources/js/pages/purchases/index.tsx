@@ -17,8 +17,10 @@ import {
 import {
     dateInputValue,
     formatMoney,
-    type PaginatedPurchases,
-    type PurchaseOrder,
+} from '@/pages/purchases/types';
+import type {
+    PaginatedPurchases,
+    PurchaseOrder,
 } from '@/pages/purchases/types';
 
 export default function PurchasesIndex({

@@ -6,6 +6,7 @@ import DeleteDialog from '@/components/delete-dialog';
 import Heading from '@/components/heading';
 import Pagination from '@/components/pagination';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
     Table,
     TableBody,
@@ -43,19 +44,19 @@ export default function PurchasesIndex({
             <Head title="Purchases" />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded p-4">
-                <div className="flex items-start justify-between gap-4 rounded border p-4">
-                    <Heading title="Purchases" />
-                    <Button asChild>
-                        <Link href={PurchaseOrderController.create.url()}>
-                            <Plus />
-                            Add purchase
-                        </Link>
-                    </Button>
-                </div>
-
-                <div className="overflow-hidden rounded border border-sidebar-border/70 dark:border-sidebar-border">
+                <Card className="overflow-hidden py-0">
+                    <CardHeader className="flex flex-row items-center justify-between gap-4 border-b py-6">
+                        <Heading title="Purchases" />
+                        <Button asChild>
+                            <Link href={PurchaseOrderController.create.url()}>
+                                <Plus />
+                                Add purchase
+                            </Link>
+                        </Button>
+                    </CardHeader>
+                    <CardContent className="pb-0">
                     {purchases.data.length === 0 ? (
-                        <p className="p-6 text-sm text-muted-foreground">
+                        <p className="px-4 pb-6 text-center text-sm text-muted-foreground">
                             No purchases yet.
                         </p>
                     ) : (
@@ -136,7 +137,8 @@ export default function PurchasesIndex({
                             />
                         </>
                     )}
-                </div>
+                    </CardContent>
+                </Card>
             </div>
 
             <DeleteDialog

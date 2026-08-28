@@ -49,7 +49,7 @@ export default function Pagination({
     }
 
     return (
-        <div className="flex flex-col gap-3 border-t px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-t py-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-muted-foreground">
                 Showing {from} to {to} of {total}
             </p>

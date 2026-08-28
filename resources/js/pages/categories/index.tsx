@@ -6,6 +6,7 @@ import DeleteDialog from '@/components/delete-dialog';
 import Heading from '@/components/heading';
 import Pagination from '@/components/pagination';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import {
     Table,
@@ -57,114 +58,120 @@ export default function CategoriesIndex({
             <Head title="Categories" />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded p-4">
-                <div className="flex items-start justify-between gap-4 rounded border p-4">
-                    <Heading title="Categories" />
-                    <Button onClick={openCreate}>
-                        <Plus />
-                        Add category
-                    </Button>
-                </div>
-
-                <div className="overflow-hidden rounded border border-sidebar-border/70 dark:border-sidebar-border">
-                    {categories.data.length === 0 ? (
-                        <p className="p-6 text-sm text-muted-foreground">
-                            No categories yet.
-                        </p>
-                    ) : (
-                        <>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Name</TableHead>
-                                        <TableHead>Parent</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-center">
-                                            Actions
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {categories.data.map((category) => (
-                                        <TableRow key={category.id}>
-                                            <TableCell>
-                                                {category.name}
-                                            </TableCell>
-                                            <TableCell>
-                                                {category.parent?.name ?? '—'}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Form
-                                                    {...CategoryController.toggleStatus.form(
-                                                        category,
-                                                    )}
-                                                    options={{
-                                                        preserveScroll: true,
-                                                    }}
-                                                >
-                                                    {({
-                                                        processing,
-                                                        submit,
-                                                    }) => (
-                                                        <Switch
-                                                            checked={
-                                                                category.status ===
-                                                                'active'
-                                                            }
-                                                            disabled={
-                                                                processing
-                                                            }
-                                                            onCheckedChange={() =>
-                                                                submit()
-                                                            }
-                                                            aria-label={`Toggle status for ${category.name}`}
-                                                        />
-                                                    )}
-                                                </Form>
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <div className="flex flex-wrap items-center justify-center gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="icon"
-                                                        className="size-8"
-                                                        onClick={() =>
-                                                            openEdit(category)
-                                                        }
-                                                    >
-                                                        <Pencil />
-                                                        <span className="sr-only">
-                                                            Edit
-                                                        </span>
-                                                    </Button>
-                                                    <Button
-                                                        variant="destructive"
-                                                        size="icon"
-                                                        className="size-8"
-                                                        onClick={() =>
-                                                            openDelete(category)
-                                                        }
-                                                    >
-                                                        <Trash2 />
-                                                        <span className="sr-only">
-                                                            Delete
-                                                        </span>
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
+                <Card className="overflow-hidden py-0">
+                    <CardHeader className="flex flex-row items-center justify-between gap-4 border-b py-6">
+                        <Heading title="Categories" />
+                        <Button onClick={openCreate}>
+                            <Plus />
+                            Add category
+                        </Button>
+                    </CardHeader>
+                    <CardContent className="pb-0">
+                        {categories.data.length === 0 ? (
+                            <p className="px-4 pb-6 text-center text-sm text-muted-foreground">
+                                No categories yet.
+                            </p>
+                        ) : (
+                            <>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Name</TableHead>
+                                            <TableHead>Parent</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead className="text-center">
+                                                Actions
+                                            </TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                            <Pagination
-                                links={categories.links}
-                                from={categories.from}
-                                to={categories.to}
-                                total={categories.total}
-                                lastPage={categories.last_page}
-                            />
-                        </>
-                    )}
-                </div>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {categories.data.map((category) => (
+                                            <TableRow key={category.id}>
+                                                <TableCell>
+                                                    {category.name}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {category.parent?.name ??
+                                                        '—'}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Form
+                                                        {...CategoryController.toggleStatus.form(
+                                                            category,
+                                                        )}
+                                                        options={{
+                                                            preserveScroll: true,
+                                                        }}
+                                                    >
+                                                        {({
+                                                            processing,
+                                                            submit,
+                                                        }) => (
+                                                            <Switch
+                                                                checked={
+                                                                    category.status ===
+                                                                    'active'
+                                                                }
+                                                                disabled={
+                                                                    processing
+                                                                }
+                                                                onCheckedChange={() =>
+                                                                    submit()
+                                                                }
+                                                                aria-label={`Toggle status for ${category.name}`}
+                                                            />
+                                                        )}
+                                                    </Form>
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    <div className="flex flex-wrap items-center justify-center gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="icon"
+                                                            className="size-8"
+                                                            onClick={() =>
+                                                                openEdit(
+                                                                    category,
+                                                                )
+                                                            }
+                                                        >
+                                                            <Pencil />
+                                                            <span className="sr-only">
+                                                                Edit
+                                                            </span>
+                                                        </Button>
+                                                        <Button
+                                                            variant="destructive"
+                                                            size="icon"
+                                                            className="size-8"
+                                                            onClick={() =>
+                                                                openDelete(
+                                                                    category,
+                                                                )
+                                                            }
+                                                        >
+                                                            <Trash2 />
+                                                            <span className="sr-only">
+                                                                Delete
+                                                            </span>
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                                <Pagination
+                                    links={categories.links}
+                                    from={categories.from}
+                                    to={categories.to}
+                                    total={categories.total}
+                                    lastPage={categories.last_page}
+                                />
+                            </>
+                        )}
+                    </CardContent>
+                </Card>
             </div>
 
             <CategoryFormDialog

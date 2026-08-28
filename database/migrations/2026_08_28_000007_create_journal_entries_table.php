@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('journal_entries', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('number')->index();
+            $table->string('number')->index();
             $table->date('date')->index();
             $table->text('narration')->nullable();
             $table->nullableMorphs('journalable');

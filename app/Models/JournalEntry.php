@@ -13,7 +13,7 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
- * @property Carbon $number
+ * @property string $number
  * @property Carbon $date
  * @property string|null $narration
  * @property string|null $journalable_type
@@ -35,7 +35,6 @@ class JournalEntry extends Model
     protected function casts(): array
     {
         return [
-            'number' => 'datetime',
             'date' => 'date',
         ];
     }

@@ -6,4 +6,5 @@ enum StockMovementType: string
 {
     case Purchase = 'purchase';
     case Sale = 'sale';
+    case SaleReturn = 'sale_return';
 }

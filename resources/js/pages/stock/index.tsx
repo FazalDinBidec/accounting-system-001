@@ -43,6 +43,7 @@ export default function StockIndex({
                                             <TableHead>Product</TableHead>
                                             <TableHead>Purchased</TableHead>
                                             <TableHead>Sold</TableHead>
+                                            <TableHead>Returned</TableHead>
                                             <TableHead>On hand</TableHead>
                                             <TableHead className="text-center">
                                                 Actions
@@ -62,6 +63,9 @@ export default function StockIndex({
                                                 </TableCell>
                                                 <TableCell>
                                                     {formatQty(product.sold)}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {formatQty(product.returned)}
                                                 </TableCell>
                                                 <TableCell>
                                                     {formatQty(product.on_hand)}

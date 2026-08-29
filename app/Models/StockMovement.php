@@ -60,17 +60,19 @@ class StockMovement extends Model
         return $this->morphTo();
     }
 
-    public static function syncForOrder(PurchaseOrder|SaleOrder $order): void
+    public static function syncForOrder(PurchaseOrder|SaleOrder|SaleReturn $order): void
     {
         $order->stockMovements()->delete();
         $order->loadMissing('items');
 
-        $type = $order instanceof PurchaseOrder
-            ? StockMovementType::Purchase
-            : StockMovementType::Sale;
+        $type = match (true) {
+            $order instanceof PurchaseOrder => StockMovementType::Purchase,
+            $order instanceof SaleOrder => StockMovementType::Sale,
+            $order instanceof SaleReturn => StockMovementType::SaleReturn,
+        };
 
         $order->stockMovements()->createMany(
-            $order->items->map(fn (PurchaseOrderItem|SaleOrderItem $item): array => [
+            $order->items->map(fn (PurchaseOrderItem|SaleOrderItem|SaleReturnItem $item): array => [
                 'product_id' => $item->product_id,
                 'type' => $type,
                 'quantity' => $item->quantity,

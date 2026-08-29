@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Database\Factories\SaleOrderFactory;
+use Database\Factories\SaleReturnFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,32 +14,23 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
- * @property int $party_id
+ * @property int $sale_id
  * @property string $number
  * @property Carbon $date
  * @property string $sub_total
- * @property string $other_charges
  * @property string $total_amount
  * @property string|null $notes
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read Party $party
- * @property-read Collection<int, SaleOrderItem> $items
- * @property-read Collection<int, SaleReturn> $returns
+ * @property-read SaleOrder $saleOrder
+ * @property-read Collection<int, SaleReturnItem> $items
  * @property-read Collection<int, StockMovement> $stockMovements
  */
-#[Fillable(['party_id', 'number', 'date', 'sub_total', 'other_charges', 'total_amount', 'notes'])]
-class SaleOrder extends Model
+#[Fillable(['sale_id', 'number', 'date', 'sub_total', 'total_amount', 'notes'])]
+class SaleReturn extends Model
 {
-    /** @use HasFactory<SaleOrderFactory> */
+    /** @use HasFactory<SaleReturnFactory> */
     use HasFactory;
-
-    /**
-     * @var array<string, mixed>
-     */
-    protected $attributes = [
-        'other_charges' => 0,
-    ];
 
     /**
      * @return array<string, string>
@@ -47,36 +38,27 @@ class SaleOrder extends Model
     protected function casts(): array
     {
         return [
-            'party_id' => 'integer',
+            'sale_id' => 'integer',
             'date' => 'date',
             'sub_total' => 'decimal:2',
-            'other_charges' => 'decimal:2',
             'total_amount' => 'decimal:2',
         ];
     }
 
     /**
-     * @return BelongsTo<Party, $this>
+     * @return BelongsTo<SaleOrder, $this>
      */
-    public function party(): BelongsTo
+    public function saleOrder(): BelongsTo
     {
-        return $this->belongsTo(Party::class);
+        return $this->belongsTo(SaleOrder::class, 'sale_id');
     }
 
     /**
-     * @return HasMany<SaleOrderItem, $this>
+     * @return HasMany<SaleReturnItem, $this>
      */
     public function items(): HasMany
     {
-        return $this->hasMany(SaleOrderItem::class, 'sale_id');
-    }
-
-    /**
-     * @return HasMany<SaleReturn, $this>
-     */
-    public function returns(): HasMany
-    {
-        return $this->hasMany(SaleReturn::class, 'sale_id');
+        return $this->hasMany(SaleReturnItem::class);
     }
 
     /**
@@ -89,8 +71,8 @@ class SaleOrder extends Model
 
     protected static function booted(): void
     {
-        static::deleting(function (SaleOrder $saleOrder): void {
-            $saleOrder->stockMovements()->delete();
+        static::deleting(function (SaleReturn $saleReturn): void {
+            $saleReturn->stockMovements()->delete();
         });
     }
 }

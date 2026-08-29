@@ -63,6 +63,12 @@ class SaleOrderController extends Controller
 
     public function update(Request $request, SaleOrder $saleOrder): RedirectResponse
     {
+        if ($saleOrder->returns()->exists()) {
+            Toast::error(__('This sale has returns. Delete the returns before editing.'));
+
+            return back();
+        }
+
         $this->persist($saleOrder, $this->validatedAttributes($request));
 
         Toast::success(__('Sale updated.'));
@@ -72,6 +78,12 @@ class SaleOrderController extends Controller
 
     public function destroy(SaleOrder $saleOrder): RedirectResponse
     {
+        if ($saleOrder->returns()->exists()) {
+            Toast::error(__('This sale has returns. Delete the returns first.'));
+
+            return back();
+        }
+
         $saleOrder->delete();
 
         Toast::success(__('Sale deleted.'));

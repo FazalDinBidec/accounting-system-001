@@ -5,6 +5,7 @@ export type StockSummary = {
     name: string;
     purchased: string;
     sold: string;
+    returned: string;
     on_hand: string;
 };
 

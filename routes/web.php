@@ -6,6 +6,7 @@ use App\Http\Controllers\PartyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\SaleOrderController;
+use App\Http\Controllers\SaleReturnController;
 use App\Http\Controllers\StockController;
 use Illuminate\Support\Facades\Route;
 
@@ -58,6 +59,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{saleOrder}/edit', 'edit')->name('edit');
             Route::put('/{saleOrder}', 'update')->name('update');
             Route::delete('/{saleOrder}', 'destroy')->name('destroy');
+        });
+
+    Route::prefix('sale-returns')
+        ->name('sale-returns.')
+        ->controller(SaleReturnController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::get('/search-sales', 'searchSales')->name('searchSales');
+            Route::get('/lookup/{saleOrder}', 'lookup')->name('lookup');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{saleReturn}/edit', 'edit')->name('edit');
+            Route::put('/{saleReturn}', 'update')->name('update');
+            Route::delete('/{saleReturn}', 'destroy')->name('destroy');
         });
 
     Route::prefix('stock')

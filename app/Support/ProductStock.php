@@ -6,6 +6,7 @@ use App\Enums\StockMovementType;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\SaleOrder;
+use App\Models\SaleReturn;
 use App\Models\StockMovement;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -16,18 +17,20 @@ use Illuminate\Support\Facades\DB;
 final class ProductStock
 {
     /**
-     * @return LengthAwarePaginator<int, array{id: int, name: string, purchased: string, sold: string, on_hand: string}>
+     * @return LengthAwarePaginator<int, array{id: int, name: string, purchased: string, sold: string, returned: string, on_hand: string}>
      */
     public static function summaries(): LengthAwarePaginator
     {
         $productsTable = (new Product)->getTable();
         $purchase = StockMovementType::Purchase->value;
         $sale = StockMovementType::Sale->value;
+        $saleReturn = StockMovementType::SaleReturn->value;
 
         $totals = StockMovement::query()
             ->select('product_id')
             ->selectRaw('SUM(CASE WHEN type = ? THEN quantity ELSE 0 END) as purchased', [$purchase])
             ->selectRaw('SUM(CASE WHEN type = ? THEN quantity ELSE 0 END) as sold', [$sale])
+            ->selectRaw('SUM(CASE WHEN type = ? THEN quantity ELSE 0 END) as returned', [$saleReturn])
             ->groupBy('product_id');
 
         return Product::query()
@@ -36,6 +39,7 @@ final class ProductStock
                 "{$productsTable}.name",
                 DB::raw('COALESCE(stock_totals.purchased, 0) as purchased'),
                 DB::raw('COALESCE(stock_totals.sold, 0) as sold'),
+                DB::raw('COALESCE(stock_totals.returned, 0) as returned'),
             ])
             ->leftJoinSub($totals, 'stock_totals', 'stock_totals.product_id', '=', "{$productsTable}.id")
             ->orderBy("{$productsTable}.name")
@@ -44,13 +48,15 @@ final class ProductStock
             ->through(function (Product $product): array {
                 $purchased = bcadd((string) $product->getAttribute('purchased'), '0', 2);
                 $sold = bcadd((string) $product->getAttribute('sold'), '0', 2);
+                $returned = bcadd((string) $product->getAttribute('returned'), '0', 2);
 
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
                     'purchased' => $purchased,
                     'sold' => $sold,
-                    'on_hand' => bcsub($purchased, $sold, 2),
+                    'returned' => $returned,
+                    'on_hand' => bcsub(bcadd($purchased, $returned, 2), $sold, 2),
                 ];
             });
     }
@@ -64,6 +70,7 @@ final class ProductStock
             ->select('product_id')
             ->selectRaw('SUM(CASE WHEN type = ? THEN quantity ELSE 0 END) as purchased', [StockMovementType::Purchase->value])
             ->selectRaw('SUM(CASE WHEN type = ? THEN quantity ELSE 0 END) as sold', [StockMovementType::Sale->value])
+            ->selectRaw('SUM(CASE WHEN type = ? THEN quantity ELSE 0 END) as returned', [StockMovementType::SaleReturn->value])
             ->groupBy('product_id');
 
         if ($excludeStockable !== null) {
@@ -78,9 +85,10 @@ final class ProductStock
             ->mapWithKeys(function (StockMovement $row): array {
                 $purchased = bcadd((string) $row->getAttribute('purchased'), '0', 2);
                 $sold = bcadd((string) $row->getAttribute('sold'), '0', 2);
+                $returned = bcadd((string) $row->getAttribute('returned'), '0', 2);
 
                 return [
-                    (int) $row->product_id => bcsub($purchased, $sold, 2),
+                    (int) $row->product_id => bcsub(bcadd($purchased, $returned, 2), $sold, 2),
                 ];
             })
             ->all();
@@ -116,9 +124,10 @@ final class ProductStock
 
         foreach ($movements as $movement) {
             $quantity = bcadd((string) $movement->quantity, '0', 2);
-            $isPurchase = $movement->type === StockMovementType::Purchase;
+            $isInbound = $movement->type === StockMovementType::Purchase
+                || $movement->type === StockMovementType::SaleReturn;
 
-            if ($isPurchase) {
+            if ($isInbound) {
                 $balance = bcadd($balance, $quantity, 2);
                 $quantityIn = $quantity;
                 $quantityOut = '0.00';
@@ -129,7 +138,9 @@ final class ProductStock
             }
 
             $stockable = $movement->stockable;
-            $number = $stockable instanceof PurchaseOrder || $stockable instanceof SaleOrder
+            $number = $stockable instanceof PurchaseOrder
+                || $stockable instanceof SaleOrder
+                || $stockable instanceof SaleReturn
                 ? $stockable->number
                 : '—';
 

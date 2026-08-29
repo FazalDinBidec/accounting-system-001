@@ -5,6 +5,7 @@ import {
     Package,
     ShoppingBag,
     ShoppingCart,
+    Undo2,
     Tags,
     Users,
     Warehouse,
@@ -27,6 +28,7 @@ import { index as categories } from '@/routes/categories';
 import { index as parties } from '@/routes/parties';
 import { index as products } from '@/routes/products';
 import { index as purchases } from '@/routes/purchases';
+import { index as saleReturns } from '@/routes/sale-returns';
 import { index as sales } from '@/routes/sales';
 import { index as stock } from '@/routes/stock';
 import type { NavItem } from '@/types';
@@ -56,6 +58,11 @@ const mainNavItems: NavItem[] = [
         title: 'Sales',
         href: sales(),
         icon: ShoppingBag,
+    },
+    {
+        title: 'Sale Returns',
+        href: saleReturns(),
+        icon: Undo2,
     },
     {
         title: 'Stock',

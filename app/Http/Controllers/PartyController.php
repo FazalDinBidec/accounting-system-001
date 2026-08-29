@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Party;
-use App\Toast;
+use App\Support\Toast;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;

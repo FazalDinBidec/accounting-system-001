@@ -6,6 +6,7 @@ use App\Http\Controllers\PartyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\SaleOrderController;
+use App\Http\Controllers\StockController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -57,6 +58,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{saleOrder}/edit', 'edit')->name('edit');
             Route::put('/{saleOrder}', 'update')->name('update');
             Route::delete('/{saleOrder}', 'destroy')->name('destroy');
+        });
+
+    Route::prefix('stock')
+        ->name('stock.')
+        ->controller(StockController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/{product}', 'show')->name('show');
         });
 
     Route::prefix('parties')

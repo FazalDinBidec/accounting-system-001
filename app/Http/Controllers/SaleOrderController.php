@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Party;
 use App\Models\Product;
 use App\Models\SaleOrder;
-use App\Toast;
+use App\Models\StockMovement;
+use App\Support\ProductStock;
+use App\Support\Toast;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
@@ -52,7 +54,10 @@ class SaleOrderController extends Controller
         return Inertia::render('sales/edit', [
             'sale' => $saleOrder,
             'parties' => $this->partyOptions($saleOrder->party_id),
-            'products' => $this->productOptions($saleOrder->items->pluck('product_id')->all()),
+            'products' => $this->productOptions(
+                $saleOrder->items->pluck('product_id')->all(),
+                $saleOrder,
+            ),
         ]);
     }
 
@@ -152,6 +157,8 @@ class SaleOrderController extends Controller
             }
 
             $saleOrder->items()->createMany($itemRows);
+            $saleOrder->unsetRelation('items');
+            StockMovement::syncForOrder($saleOrder);
 
             return $saleOrder;
         });
@@ -178,9 +185,9 @@ class SaleOrderController extends Controller
      * @param  list<int>  $includeProductIds
      * @return Collection<int, Product>
      */
-    private function productOptions(array $includeProductIds = []): Collection
+    private function productOptions(array $includeProductIds = [], ?SaleOrder $excludeStockable = null): Collection
     {
-        return Product::query()
+        $products = Product::query()
             ->where(function (Builder $query) use ($includeProductIds): void {
                 $query->where('is_active', true);
 
@@ -190,5 +197,7 @@ class SaleOrderController extends Controller
             })
             ->orderBy('name')
             ->get(['id', 'name']);
+
+        return ProductStock::withOnHand($products, $excludeStockable);
     }
 }

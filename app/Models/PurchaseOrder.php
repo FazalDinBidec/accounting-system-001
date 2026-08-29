@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -24,6 +25,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read Party $party
  * @property-read Collection<int, PurchaseOrderItem> $items
+ * @property-read Collection<int, StockMovement> $stockMovements
  */
 #[Fillable(['party_id', 'number', 'date', 'sub_total', 'other_charges', 'total_amount', 'notes'])]
 class PurchaseOrder extends Model
@@ -66,5 +68,20 @@ class PurchaseOrder extends Model
     public function items(): HasMany
     {
         return $this->hasMany(PurchaseOrderItem::class, 'purchase_id');
+    }
+
+    /**
+     * @return MorphMany<StockMovement, $this>
+     */
+    public function stockMovements(): MorphMany
+    {
+        return $this->morphMany(StockMovement::class, 'stockable');
+    }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (PurchaseOrder $purchaseOrder): void {
+            $purchaseOrder->stockMovements()->delete();
+        });
     }
 }

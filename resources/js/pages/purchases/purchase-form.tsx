@@ -210,7 +210,7 @@ export default function PurchaseForm({
                                                         value: String(
                                                             product.id,
                                                         ),
-                                                        label: product.name,
+                                                        label: `${product.name} (${formatMoney(product.on_hand)})`,
                                                     }),
                                                 )}
                                             />

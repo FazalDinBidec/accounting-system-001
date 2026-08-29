@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\AccountType;
 use App\Models\Account;
-use App\Toast;
+use App\Support\Toast;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

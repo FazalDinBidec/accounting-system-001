@@ -3,6 +3,7 @@ import type { Paginated } from '@/components/pagination';
 export type SaleOption = {
     id: number;
     name: string;
+    on_hand: string;
 };
 
 export type SaleOrderItem = {

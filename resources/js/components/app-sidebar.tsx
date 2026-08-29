@@ -7,6 +7,7 @@ import {
     ShoppingCart,
     Tags,
     Users,
+    Warehouse,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
@@ -27,6 +28,7 @@ import { index as parties } from '@/routes/parties';
 import { index as products } from '@/routes/products';
 import { index as purchases } from '@/routes/purchases';
 import { index as sales } from '@/routes/sales';
+import { index as stock } from '@/routes/stock';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -54,6 +56,11 @@ const mainNavItems: NavItem[] = [
         title: 'Sales',
         href: sales(),
         icon: ShoppingBag,
+    },
+    {
+        title: 'Stock',
+        href: stock(),
+        icon: Warehouse,
     },
     {
         title: 'Parties',

@@ -205,7 +205,7 @@ export default function SaleForm({
                                                         value: String(
                                                             product.id,
                                                         ),
-                                                        label: product.name,
+                                                        label: `${product.name} (${formatMoney(product.on_hand)})`,
                                                     }),
                                                 )}
                                             />

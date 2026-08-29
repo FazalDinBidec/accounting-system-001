@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class AccountFactory extends Factory
 {
     /**
-     * @return array{name: string, type: AccountType, parent_id: null, is_active: bool}
+     * @return array{name: string, type: AccountType, parent_id: null, is_system: bool, is_active: bool}
      */
     public function definition(): array
     {
@@ -20,6 +20,7 @@ class AccountFactory extends Factory
             'name' => fake()->unique()->words(2, true),
             'type' => AccountType::Asset,
             'parent_id' => null,
+            'is_system' => false,
             'is_active' => true,
         ];
     }

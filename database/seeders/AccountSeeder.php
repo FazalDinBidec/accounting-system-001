@@ -18,14 +18,13 @@ class AccountSeeder extends Seeder
                 ? null
                 : Account::query()->where('name', $account['parent'])->value('id');
 
-            Account::query()->firstOrCreate(
-                ['name' => $account['name']],
-                [
-                    'type' => $account['type'],
-                    'parent_id' => $parentId,
-                    'is_active' => true,
-                ],
-            );
+            $record = Account::query()->firstOrNew(['name' => $account['name']]);
+            $record->forceFill([
+                'type' => $account['type'],
+                'parent_id' => $parentId,
+                'is_system' => true,
+                'is_active' => true,
+            ])->save();
         }
     }
 

@@ -37,6 +37,10 @@ class AccountController extends Controller
 
     public function update(Request $request, Account $account): RedirectResponse
     {
+        if ($this->systemAccountBlocked($account)) {
+            return back();
+        }
+
         $account->update($this->validatedAttributes($request, $account));
 
         Toast::success(__('Account updated.'));
@@ -46,6 +50,10 @@ class AccountController extends Controller
 
     public function toggleStatus(Account $account): RedirectResponse
     {
+        if ($this->systemAccountBlocked($account)) {
+            return back();
+        }
+
         $account->update([
             'is_active' => ! $account->is_active,
         ]);
@@ -57,6 +65,10 @@ class AccountController extends Controller
 
     public function destroy(Account $account): RedirectResponse
     {
+        if ($this->systemAccountBlocked($account)) {
+            return back();
+        }
+
         if ($account->children()->exists()) {
             Toast::error(__('Delete child accounts first.'));
 
@@ -98,5 +110,16 @@ class AccountController extends Controller
         return Account::query()
             ->orderBy('name')
             ->get(['id', 'name']);
+    }
+
+    private function systemAccountBlocked(Account $account): bool
+    {
+        if (! $account->is_system) {
+            return false;
+        }
+
+        Toast::error(__('System accounts cannot be changed.'));
+
+        return true;
     }
 }

@@ -17,6 +17,7 @@ export type Account = {
     name: string;
     type: AccountType;
     parent_id: number | null;
+    is_system: boolean;
     is_active: boolean;
     parent?: AccountParentOption | null;
 };

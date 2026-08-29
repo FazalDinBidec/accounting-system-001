@@ -44,12 +44,20 @@ export default function AccountsIndex({
     }
 
     function openEdit(account: Account): void {
+        if (account.is_system) {
+            return;
+        }
+
         setDialogAccount(account);
         setDialogKey((key) => key + 1);
         setDialogOpen(true);
     }
 
     function openDelete(account: Account): void {
+        if (account.is_system) {
+            return;
+        }
+
         setDeleteAccount(account);
         setDeleteOpen(true);
     }
@@ -121,7 +129,8 @@ export default function AccountsIndex({
                                                                     account.is_active
                                                                 }
                                                                 disabled={
-                                                                    processing
+                                                                    processing ||
+                                                                    account.is_system
                                                                 }
                                                                 onCheckedChange={() =>
                                                                     submit()
@@ -132,38 +141,44 @@ export default function AccountsIndex({
                                                     </Form>
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    <div className="flex flex-wrap items-center justify-center gap-2">
-                                                        <Button
-                                                            variant="outline"
-                                                            size="icon"
-                                                            className="size-8"
-                                                            onClick={() =>
-                                                                openEdit(
-                                                                    account,
-                                                                )
-                                                            }
-                                                        >
-                                                            <Pencil />
-                                                            <span className="sr-only">
-                                                                Edit
-                                                            </span>
-                                                        </Button>
-                                                        <Button
-                                                            variant="destructive"
-                                                            size="icon"
-                                                            className="size-8"
-                                                            onClick={() =>
-                                                                openDelete(
-                                                                    account,
-                                                                )
-                                                            }
-                                                        >
-                                                            <Trash2 />
-                                                            <span className="sr-only">
-                                                                Delete
-                                                            </span>
-                                                        </Button>
-                                                    </div>
+                                                    {account.is_system ? (
+                                                        <span className="text-sm text-muted-foreground">
+                                                            System
+                                                        </span>
+                                                    ) : (
+                                                        <div className="flex flex-wrap items-center justify-center gap-2">
+                                                            <Button
+                                                                variant="outline"
+                                                                size="icon"
+                                                                className="size-8"
+                                                                onClick={() =>
+                                                                    openEdit(
+                                                                        account,
+                                                                    )
+                                                                }
+                                                            >
+                                                                <Pencil />
+                                                                <span className="sr-only">
+                                                                    Edit
+                                                                </span>
+                                                            </Button>
+                                                            <Button
+                                                                variant="destructive"
+                                                                size="icon"
+                                                                className="size-8"
+                                                                onClick={() =>
+                                                                    openDelete(
+                                                                        account,
+                                                                    )
+                                                                }
+                                                            >
+                                                                <Trash2 />
+                                                                <span className="sr-only">
+                                                                    Delete
+                                                                </span>
+                                                            </Button>
+                                                        </div>
+                                                    )}
                                                 </TableCell>
                                             </TableRow>
                                         ))}

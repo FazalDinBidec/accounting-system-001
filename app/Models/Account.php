@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property AccountType $type
  * @property int|null $parent_id
+ * @property bool $is_system
  * @property bool $is_active
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -31,6 +32,7 @@ class Account extends Model
      */
     protected $attributes = [
         'type' => AccountType::Asset->value,
+        'is_system' => false,
         'is_active' => true,
     ];
 
@@ -42,6 +44,7 @@ class Account extends Model
         return [
             'type' => AccountType::class,
             'parent_id' => 'integer',
+            'is_system' => 'boolean',
             'is_active' => 'boolean',
         ];
     }

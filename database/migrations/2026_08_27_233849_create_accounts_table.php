@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('type')->index();
             $table->foreignId('parent_id')->nullable()->index()->constrained('accounts')->nullOnDelete();
+            $table->boolean('is_system')->default(false)->index();
             $table->boolean('is_active')->default(true)->index();
             $table->timestamps();
         });

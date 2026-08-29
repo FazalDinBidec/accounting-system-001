@@ -20,6 +20,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read Collection<int, JournalEntryLine> $journalEntryLines
  * @property-read Collection<int, PurchaseOrder> $purchaseOrders
+ * @property-read Collection<int, SaleOrder> $saleOrders
  */
 #[Fillable(['name', 'phone', 'address', 'is_active'])]
 class Party extends Model
@@ -58,5 +59,13 @@ class Party extends Model
     public function purchaseOrders(): HasMany
     {
         return $this->hasMany(PurchaseOrder::class);
+    }
+
+    /**
+     * @return HasMany<SaleOrder, $this>
+     */
+    public function saleOrders(): HasMany
+    {
+        return $this->hasMany(SaleOrder::class);
     }
 }

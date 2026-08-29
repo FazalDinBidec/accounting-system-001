@@ -62,7 +62,7 @@ export default function PartiesIndex({
                     </CardHeader>
                     <CardContent className="pb-0">
                     {parties.data.length === 0 ? (
-                        <p className="px-4 pb-6 text-center text-sm text-muted-foreground">
+                        <p className="p-4 text-center text-sm text-muted-foreground">
                             No parties yet.
                         </p>
                     ) : (

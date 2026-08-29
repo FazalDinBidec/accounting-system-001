@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import PurchaseOrderController from '@/actions/App/Http/Controllers/PurchaseOrderController';
+import SaleOrderController from '@/actions/App/Http/Controllers/SaleOrderController';
 import DeleteDialog from '@/components/delete-dialog';
 import Heading from '@/components/heading';
 import Pagination from '@/components/pagination';
@@ -15,49 +15,37 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import {
-    dateInputValue,
-    formatMoney,
-} from '@/pages/purchases/types';
-import type {
-    PaginatedPurchases,
-    PurchaseOrder,
-} from '@/pages/purchases/types';
+import { dateInputValue, formatMoney } from '@/pages/sales/types';
+import type { PaginatedSales, SaleOrder } from '@/pages/sales/types';
 
-export default function PurchasesIndex({
-    purchases,
-}: {
-    purchases: PaginatedPurchases;
-}) {
-    const [deletePurchase, setDeletePurchase] = useState<PurchaseOrder | null>(
-        null,
-    );
+export default function SalesIndex({ sales }: { sales: PaginatedSales }) {
+    const [deleteSale, setDeleteSale] = useState<SaleOrder | null>(null);
     const [deleteOpen, setDeleteOpen] = useState(false);
 
-    function openDelete(purchase: PurchaseOrder): void {
-        setDeletePurchase(purchase);
+    function openDelete(sale: SaleOrder): void {
+        setDeleteSale(sale);
         setDeleteOpen(true);
     }
 
     return (
         <>
-            <Head title="Purchases" />
+            <Head title="Sales" />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded p-4">
                 <Card className="overflow-hidden py-0">
                     <CardHeader className="flex flex-row items-center justify-between gap-4 border-b py-6">
-                        <Heading title="Purchases" />
+                        <Heading title="Sales" />
                         <Button asChild>
-                            <Link href={PurchaseOrderController.create.url()}>
+                            <Link href={SaleOrderController.create.url()}>
                                 <Plus />
-                                Add purchase
+                                Add sale
                             </Link>
                         </Button>
                     </CardHeader>
                     <CardContent className="pb-0">
-                    {purchases.data.length === 0 ? (
+                    {sales.data.length === 0 ? (
                         <p className="p-4 text-center text-sm text-muted-foreground">
-                            No purchases yet.
+                            No sales yet.
                         </p>
                     ) : (
                         <>
@@ -74,21 +62,19 @@ export default function PurchasesIndex({
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {purchases.data.map((purchase) => (
-                                        <TableRow key={purchase.id}>
+                                    {sales.data.map((sale) => (
+                                        <TableRow key={sale.id}>
                                             <TableCell>
-                                                {purchase.number}
+                                                {sale.number}
                                             </TableCell>
                                             <TableCell>
-                                                {purchase.party?.name ?? '—'}
+                                                {sale.party?.name ?? '—'}
                                             </TableCell>
                                             <TableCell>
-                                                {dateInputValue(purchase.date)}
+                                                {dateInputValue(sale.date)}
                                             </TableCell>
                                             <TableCell>
-                                                {formatMoney(
-                                                    purchase.total_amount,
-                                                )}
+                                                {formatMoney(sale.total_amount)}
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 <div className="flex flex-wrap items-center justify-center gap-2">
@@ -99,8 +85,8 @@ export default function PurchasesIndex({
                                                         asChild
                                                     >
                                                         <Link
-                                                            href={PurchaseOrderController.edit.url(
-                                                                purchase,
+                                                            href={SaleOrderController.edit.url(
+                                                                sale,
                                                             )}
                                                         >
                                                             <Pencil />
@@ -114,7 +100,7 @@ export default function PurchasesIndex({
                                                         size="icon"
                                                         className="size-8"
                                                         onClick={() =>
-                                                            openDelete(purchase)
+                                                            openDelete(sale)
                                                         }
                                                     >
                                                         <Trash2 />
@@ -129,11 +115,11 @@ export default function PurchasesIndex({
                                 </TableBody>
                             </Table>
                             <Pagination
-                                links={purchases.links}
-                                from={purchases.from}
-                                to={purchases.to}
-                                total={purchases.total}
-                                lastPage={purchases.last_page}
+                                links={sales.links}
+                                from={sales.from}
+                                to={sales.to}
+                                total={sales.total}
+                                lastPage={sales.last_page}
                             />
                         </>
                     )}
@@ -144,15 +130,15 @@ export default function PurchasesIndex({
             <DeleteDialog
                 open={deleteOpen}
                 onOpenChange={setDeleteOpen}
-                title="Delete purchase"
+                title="Delete sale"
                 description={
-                    deletePurchase
-                        ? `Delete ${deletePurchase.number}? This cannot be undone.`
+                    deleteSale
+                        ? `Delete ${deleteSale.number}? This cannot be undone.`
                         : 'This cannot be undone.'
                 }
                 action={
-                    deletePurchase
-                        ? PurchaseOrderController.destroy.form(deletePurchase)
+                    deleteSale
+                        ? SaleOrderController.destroy.form(deleteSale)
                         : undefined
                 }
             />
@@ -160,11 +146,11 @@ export default function PurchasesIndex({
     );
 }
 
-PurchasesIndex.layout = {
+SalesIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Purchases',
-            href: PurchaseOrderController.index(),
+            title: 'Sales',
+            href: SaleOrderController.index(),
         },
     ],
 };

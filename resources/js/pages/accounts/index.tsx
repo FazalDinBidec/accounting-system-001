@@ -68,107 +68,116 @@ export default function AccountsIndex({
                         </Button>
                     </CardHeader>
                     <CardContent className="pb-0">
-                    {accounts.data.length === 0 ? (
-                        <p className="px-4 pb-6 text-center text-sm text-muted-foreground">
-                            No accounts yet.
-                        </p>
-                    ) : (
-                        <>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Name</TableHead>
-                                        <TableHead>Type</TableHead>
-                                        <TableHead>Parent</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-center">
-                                            Actions
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {accounts.data.map((account) => (
-                                        <TableRow key={account.id}>
-                                            <TableCell>
-                                                {account.name}
-                                            </TableCell>
-                                            <TableCell>
-                                                {accountTypeLabels[account.type]}
-                                            </TableCell>
-                                            <TableCell>
-                                                {account.parent?.name ?? '—'}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Form
-                                                    {...AccountController.toggleStatus.form(
-                                                        account,
-                                                    )}
-                                                    options={{
-                                                        preserveScroll: true,
-                                                    }}
-                                                >
-                                                    {({
-                                                        processing,
-                                                        submit,
-                                                    }) => (
-                                                        <Switch
-                                                            checked={
-                                                                account.is_active
-                                                            }
-                                                            disabled={
-                                                                processing
-                                                            }
-                                                            onCheckedChange={() =>
-                                                                submit()
-                                                            }
-                                                            aria-label={`Toggle status for ${account.name}`}
-                                                        />
-                                                    )}
-                                                </Form>
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <div className="flex flex-wrap items-center justify-center gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="icon"
-                                                        className="size-8"
-                                                        onClick={() =>
-                                                            openEdit(account)
-                                                        }
-                                                    >
-                                                        <Pencil />
-                                                        <span className="sr-only">
-                                                            Edit
-                                                        </span>
-                                                    </Button>
-                                                    <Button
-                                                        variant="destructive"
-                                                        size="icon"
-                                                        className="size-8"
-                                                        onClick={() =>
-                                                            openDelete(account)
-                                                        }
-                                                    >
-                                                        <Trash2 />
-                                                        <span className="sr-only">
-                                                            Delete
-                                                        </span>
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
+                        {accounts.data.length === 0 ? (
+                            <p className="p-4 text-center text-sm text-muted-foreground">
+                                No accounts yet.
+                            </p>
+                        ) : (
+                            <>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Name</TableHead>
+                                            <TableHead>Type</TableHead>
+                                            <TableHead>Parent</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead className="text-center">
+                                                Actions
+                                            </TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                            <Pagination
-                                links={accounts.links}
-                                from={accounts.from}
-                                to={accounts.to}
-                                total={accounts.total}
-                                lastPage={accounts.last_page}
-                            />
-                        </>
-                    )}
+                                    </TableHeader>
+                                    <TableBody>
+                                        {accounts.data.map((account) => (
+                                            <TableRow key={account.id}>
+                                                <TableCell>
+                                                    {account.name}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {
+                                                        accountTypeLabels[
+                                                            account.type
+                                                        ]
+                                                    }
+                                                </TableCell>
+                                                <TableCell>
+                                                    {account.parent?.name ??
+                                                        '—'}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Form
+                                                        {...AccountController.toggleStatus.form(
+                                                            account,
+                                                        )}
+                                                        options={{
+                                                            preserveScroll: true,
+                                                        }}
+                                                    >
+                                                        {({
+                                                            processing,
+                                                            submit,
+                                                        }) => (
+                                                            <Switch
+                                                                checked={
+                                                                    account.is_active
+                                                                }
+                                                                disabled={
+                                                                    processing
+                                                                }
+                                                                onCheckedChange={() =>
+                                                                    submit()
+                                                                }
+                                                                aria-label={`Toggle status for ${account.name}`}
+                                                            />
+                                                        )}
+                                                    </Form>
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    <div className="flex flex-wrap items-center justify-center gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="icon"
+                                                            className="size-8"
+                                                            onClick={() =>
+                                                                openEdit(
+                                                                    account,
+                                                                )
+                                                            }
+                                                        >
+                                                            <Pencil />
+                                                            <span className="sr-only">
+                                                                Edit
+                                                            </span>
+                                                        </Button>
+                                                        <Button
+                                                            variant="destructive"
+                                                            size="icon"
+                                                            className="size-8"
+                                                            onClick={() =>
+                                                                openDelete(
+                                                                    account,
+                                                                )
+                                                            }
+                                                        >
+                                                            <Trash2 />
+                                                            <span className="sr-only">
+                                                                Delete
+                                                            </span>
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                                <Pagination
+                                    links={accounts.links}
+                                    from={accounts.from}
+                                    to={accounts.to}
+                                    total={accounts.total}
+                                    lastPage={accounts.last_page}
+                                />
+                            </>
+                        )}
                     </CardContent>
                 </Card>
             </div>

@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PartyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\SaleOrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -44,6 +45,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{purchaseOrder}/edit', 'edit')->name('edit');
             Route::put('/{purchaseOrder}', 'update')->name('update');
             Route::delete('/{purchaseOrder}', 'destroy')->name('destroy');
+        });
+
+    Route::prefix('sales')
+        ->name('sales.')
+        ->controller(SaleOrderController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{saleOrder}/edit', 'edit')->name('edit');
+            Route::put('/{saleOrder}', 'update')->name('update');
+            Route::delete('/{saleOrder}', 'destroy')->name('destroy');
         });
 
     Route::prefix('parties')

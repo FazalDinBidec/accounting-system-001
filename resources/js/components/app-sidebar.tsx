@@ -3,6 +3,7 @@ import {
     Landmark,
     LayoutGrid,
     Package,
+    ShoppingBag,
     ShoppingCart,
     Tags,
     Users,
@@ -25,6 +26,7 @@ import { index as categories } from '@/routes/categories';
 import { index as parties } from '@/routes/parties';
 import { index as products } from '@/routes/products';
 import { index as purchases } from '@/routes/purchases';
+import { index as sales } from '@/routes/sales';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -47,6 +49,11 @@ const mainNavItems: NavItem[] = [
         title: 'Purchases',
         href: purchases(),
         icon: ShoppingCart,
+    },
+    {
+        title: 'Sales',
+        href: sales(),
+        icon: ShoppingBag,
     },
     {
         title: 'Parties',

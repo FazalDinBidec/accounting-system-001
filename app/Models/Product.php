@@ -18,6 +18,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Collection<int, PurchaseOrderItem> $purchaseOrderItems
+ * @property-read Collection<int, SaleOrderItem> $saleOrderItems
  */
 #[Fillable(['name', 'description', 'is_active'])]
 class Product extends Model
@@ -48,5 +49,13 @@ class Product extends Model
     public function purchaseOrderItems(): HasMany
     {
         return $this->hasMany(PurchaseOrderItem::class);
+    }
+
+    /**
+     * @return HasMany<SaleOrderItem, $this>
+     */
+    public function saleOrderItems(): HasMany
+    {
+        return $this->hasMany(SaleOrderItem::class);
     }
 }

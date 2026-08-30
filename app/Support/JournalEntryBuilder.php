@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\Account;
 use App\Models\JournalEntry;
 use App\Models\Party;
+use Carbon\CarbonInterface;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -13,7 +14,7 @@ use InvalidArgumentException;
 
 final class JournalEntryBuilder
 {
-    private ?Carbon $date = null;
+    private ?CarbonInterface $date = null;
 
     private ?string $narration = null;
 

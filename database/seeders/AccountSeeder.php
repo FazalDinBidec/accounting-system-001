@@ -35,7 +35,9 @@ class AccountSeeder extends Seeder
     {
         return [
             ['name' => 'Cash', 'type' => AccountType::Asset, 'parent' => null],
+            ['name' => 'Cash in Hand', 'type' => AccountType::Asset, 'parent' => 'Cash'],
             ['name' => 'Bank', 'type' => AccountType::Asset, 'parent' => null],
+            ['name' => 'Bank Current', 'type' => AccountType::Asset, 'parent' => 'Bank'],
             ['name' => 'Party Receivables', 'type' => AccountType::Asset, 'parent' => null],
             ['name' => 'Inventory', 'type' => AccountType::Asset, 'parent' => null],
             ['name' => 'Party Payables', 'type' => AccountType::Liability, 'parent' => null],

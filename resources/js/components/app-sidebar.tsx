@@ -1,5 +1,7 @@
 import { Link } from '@inertiajs/react';
 import {
+    FileChartColumn,
+    Receipt,
     Landmark,
     LayoutGrid,
     Package,
@@ -30,6 +32,12 @@ import { index as products } from '@/routes/products';
 import { index as purchases } from '@/routes/purchases';
 import { index as saleReturns } from '@/routes/sale-returns';
 import { index as sales } from '@/routes/sales';
+import { index as vouchers } from '@/routes/vouchers';
+import {
+    generalLedger,
+    partyLedger,
+    trialBalance,
+} from '@/routes/reports';
 import { index as stock } from '@/routes/stock';
 import type { NavItem } from '@/types';
 
@@ -65,6 +73,11 @@ const mainNavItems: NavItem[] = [
         icon: Undo2,
     },
     {
+        title: 'Vouchers',
+        href: vouchers(),
+        icon: Receipt,
+    },
+    {
         title: 'Stock',
         href: stock(),
         icon: Warehouse,
@@ -78,6 +91,24 @@ const mainNavItems: NavItem[] = [
         title: 'Accounts',
         href: accounts(),
         icon: Landmark,
+    },
+    {
+        title: 'Reports',
+        icon: FileChartColumn,
+        items: [
+            {
+                title: 'Party Ledger',
+                href: partyLedger(),
+            },
+            {
+                title: 'General Ledger',
+                href: generalLedger(),
+            },
+            {
+                title: 'Trial Balance',
+                href: trialBalance(),
+            },
+        ],
     },
 ];
 

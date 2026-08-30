@@ -6,6 +6,7 @@ use App\Models\Party;
 use App\Models\Product;
 use App\Models\SaleOrder;
 use App\Models\StockMovement;
+use App\Support\DocumentJournal;
 use App\Support\ProductStock;
 use App\Support\Toast;
 use Illuminate\Database\Eloquent\Builder;
@@ -171,6 +172,7 @@ class SaleOrderController extends Controller
             $saleOrder->items()->createMany($itemRows);
             $saleOrder->unsetRelation('items');
             StockMovement::syncForOrder($saleOrder);
+            DocumentJournal::syncForSale($saleOrder);
 
             return $saleOrder;
         });

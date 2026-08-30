@@ -75,6 +75,12 @@ class AccountController extends Controller
             return back();
         }
 
+        if ($account->journalEntryLines()->exists() || $account->voucherLines()->exists()) {
+            Toast::error(__('This account is used on journals or vouchers.'));
+
+            return back();
+        }
+
         $account->delete();
 
         Toast::success(__('Account deleted.'));

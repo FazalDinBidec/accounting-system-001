@@ -6,6 +6,7 @@ use App\Models\SaleOrder;
 use App\Models\SaleOrderItem;
 use App\Models\SaleReturn;
 use App\Models\StockMovement;
+use App\Support\DocumentJournal;
 use App\Support\SaleReturnQuantities;
 use App\Support\Toast;
 use Illuminate\Database\Eloquent\Builder;
@@ -223,6 +224,7 @@ class SaleReturnController extends Controller
             $saleReturn->items()->createMany($itemRows);
             $saleReturn->unsetRelation('items');
             StockMovement::syncForOrder($saleReturn);
+            DocumentJournal::syncForSaleReturn($saleReturn);
 
             return $saleReturn;
         });

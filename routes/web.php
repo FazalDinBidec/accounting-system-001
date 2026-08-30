@@ -5,9 +5,11 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PartyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleOrderController;
 use App\Http\Controllers\SaleReturnController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\VoucherController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -75,6 +77,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/{saleReturn}', 'destroy')->name('destroy');
         });
 
+    Route::prefix('vouchers')
+        ->name('vouchers.')
+        ->controller(VoucherController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::get('/party-balance/{party}', 'partyBalance')->name('partyBalance');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{voucher}/edit', 'edit')->name('edit');
+            Route::put('/{voucher}', 'update')->name('update');
+            Route::delete('/{voucher}', 'destroy')->name('destroy');
+        });
+
     Route::prefix('stock')
         ->name('stock.')
         ->controller(StockController::class)
@@ -92,6 +107,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::patch('/{party}/toggle-status', 'toggleStatus')->name('toggleStatus');
             Route::put('/{party}', 'update')->name('update');
             Route::delete('/{party}', 'destroy')->name('destroy');
+        });
+
+    Route::prefix('reports')
+        ->name('reports.')
+        ->controller(ReportController::class)
+        ->group(function () {
+            Route::get('/party-ledger', 'partyLedger')->name('partyLedger');
+            Route::get('/general-ledger', 'generalLedger')->name('generalLedger');
+            Route::get('/trial-balance', 'trialBalance')->name('trialBalance');
         });
 
     Route::prefix('accounts')

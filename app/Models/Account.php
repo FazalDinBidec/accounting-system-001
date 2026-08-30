@@ -66,10 +66,10 @@ class Account extends Model
     }
 
     /**
-     * @return HasMany<JournalEntryLine, $this>
+     * @return HasMany<VoucherLine, $this>
      */
-    public function journalEntryLines(): HasMany
+    public function voucherLines(): HasMany
     {
-        return $this->hasMany(JournalEntryLine::class);
+        return $this->hasMany(VoucherLine::class);
     }
 }

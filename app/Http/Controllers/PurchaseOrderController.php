@@ -6,6 +6,7 @@ use App\Models\Party;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\StockMovement;
+use App\Support\DocumentJournal;
 use App\Support\ProductStock;
 use App\Support\Toast;
 use Illuminate\Database\Eloquent\Builder;
@@ -159,6 +160,7 @@ class PurchaseOrderController extends Controller
             $purchaseOrder->items()->createMany($itemRows);
             $purchaseOrder->unsetRelation('items');
             StockMovement::syncForOrder($purchaseOrder);
+            DocumentJournal::syncForPurchase($purchaseOrder);
 
             return $purchaseOrder;
         });

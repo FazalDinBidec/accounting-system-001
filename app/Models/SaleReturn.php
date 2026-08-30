@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Concerns\HasJournalEntries;
 use Database\Factories\SaleReturnFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Collection;
@@ -31,6 +32,8 @@ class SaleReturn extends Model
 {
     /** @use HasFactory<SaleReturnFactory> */
     use HasFactory;
+
+    use HasJournalEntries;
 
     /**
      * @return array<string, string>

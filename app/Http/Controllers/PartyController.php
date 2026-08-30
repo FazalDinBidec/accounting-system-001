@@ -52,6 +52,17 @@ class PartyController extends Controller
 
     public function destroy(Party $party): RedirectResponse
     {
+        if (
+            $party->saleOrders()->exists()
+            || $party->purchaseOrders()->exists()
+            || $party->vouchers()->exists()
+            || $party->journalEntryLines()->exists()
+        ) {
+            Toast::error(__('This party is used on documents or journals.'));
+
+            return back();
+        }
+
         $party->delete();
 
         Toast::success(__('Party deleted.'));

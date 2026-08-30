@@ -6,6 +6,7 @@ import FormSelect from '@/components/form-select';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -114,14 +115,17 @@ export default function PurchaseForm({
 
     return (
         <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded p-4">
-            <div className="rounded border p-4">
-                <Heading
-                    title={
-                        isEditing ? 'Edit Purchase' : 'Create New Purchase'
-                    }
-                />
-            </div>
-
+            <Card className="overflow-hidden py-0">
+                <CardHeader className="border-b py-6">
+                    <Heading
+                        title={
+                            isEditing
+                                ? 'Edit Purchase'
+                                : 'Create New Purchase'
+                        }
+                    />
+                </CardHeader>
+                <CardContent className="py-6">
             <form onSubmit={submit} className="space-y-6">
                 <div className="space-y-4 rounded border p-4">
                     <div className="grid gap-4 md:grid-cols-2">
@@ -174,27 +178,31 @@ export default function PurchaseForm({
                 <div className="space-y-4 rounded border p-4">
                     <h3 className="text-base font-semibold">Purchase Items</h3>
 
-                    <div className="overflow-x-auto rounded border">
-                        <Table>
+                    <div className="overflow-hidden rounded border">
+                        <Table className="table-fixed">
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Product</TableHead>
-                                    <TableHead className="w-28">
+                                    <TableHead className="w-[50%]">
+                                        Product
+                                    </TableHead>
+                                    <TableHead className="w-[calc((100%-50%-3rem)/3)]">
                                         Quantity
                                     </TableHead>
-                                    <TableHead className="w-32">Price</TableHead>
-                                    <TableHead className="w-36 text-right">
+                                    <TableHead className="w-[calc((100%-50%-3rem)/3)]">
+                                        Price
+                                    </TableHead>
+                                    <TableHead className="w-[calc((100%-50%-3rem)/3)] text-center whitespace-normal">
                                         Total Amount
                                     </TableHead>
-                                    <TableHead className="w-16 text-center">
-                                        Action
+                                    <TableHead className="w-12 text-center">
+                                        <span className="sr-only">Action</span>
                                     </TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {data.items.map((item, index) => (
                                     <TableRow key={index}>
-                                        <TableCell>
+                                        <TableCell className="min-w-0">
                                             <FormSelect
                                                 value={item.product_id}
                                                 onValueChange={(value) =>
@@ -266,7 +274,7 @@ export default function PurchaseForm({
                                                 }
                                             />
                                         </TableCell>
-                                        <TableCell className="text-right font-medium">
+                                        <TableCell className="text-center font-medium">
                                             {formatMoney(
                                                 toMoneyNumber(item.quantity) *
                                                     toMoneyNumber(
@@ -351,6 +359,8 @@ export default function PurchaseForm({
                     <Button disabled={processing}>Save Purchase</Button>
                 </div>
             </form>
+                </CardContent>
+            </Card>
         </div>
     );
 }

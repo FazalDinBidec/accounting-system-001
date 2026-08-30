@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Concerns\HasJournalEntries;
 use Database\Factories\PurchaseOrderFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Collection;
@@ -32,6 +33,8 @@ class PurchaseOrder extends Model
 {
     /** @use HasFactory<PurchaseOrderFactory> */
     use HasFactory;
+
+    use HasJournalEntries;
 
     /**
      * @var array<string, mixed>

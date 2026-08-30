@@ -19,6 +19,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Collection<int, JournalEntryLine> $journalEntryLines
+ * @property-read Collection<int, Voucher> $vouchers
  * @property-read Collection<int, PurchaseOrder> $purchaseOrders
  * @property-read Collection<int, SaleOrder> $saleOrders
  */
@@ -59,6 +60,14 @@ class Party extends Model
     public function purchaseOrders(): HasMany
     {
         return $this->hasMany(PurchaseOrder::class);
+    }
+
+    /**
+     * @return HasMany<Voucher, $this>
+     */
+    public function vouchers(): HasMany
+    {
+        return $this->hasMany(Voucher::class);
     }
 
     /**

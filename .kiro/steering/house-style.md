@@ -1,0 +1,10 @@
+---
+inclusion: always
+---
+
+# House style
+
+- Do not add, update, or run tests unless the user explicitly asks.
+- Do not create Form Request classes. Validate inline with `$request->validate()` in the controller.
+- Do not activate the `testing-best-practices` skill.
+- Flash toasts with `Toast::success()` / `Toast::error()`, not raw `Inertia::flash('toast', ...)`.

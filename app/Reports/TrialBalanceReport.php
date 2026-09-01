@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Support;
+namespace App\Reports;
 
 use App\Enums\AccountType;
 use App\Models\Account;

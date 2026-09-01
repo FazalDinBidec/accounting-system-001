@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Support;
+namespace App\Reports;
 
 use App\Models\Account;
 use App\Models\JournalEntryLine;

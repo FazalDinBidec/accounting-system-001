@@ -8,7 +8,7 @@ import {
     ShoppingBag,
     ShoppingCart,
     Undo2,
-    Tags,
+    // Tags,
     Users,
     Warehouse,
 } from 'lucide-react';
@@ -26,19 +26,15 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as accounts } from '@/routes/accounts';
-import { index as categories } from '@/routes/categories';
+// import { index as categories } from '@/routes/categories';
 import { index as parties } from '@/routes/parties';
 import { index as products } from '@/routes/products';
 import { index as purchases } from '@/routes/purchases';
+import { generalLedger, partyLedger, trialBalance } from '@/routes/reports';
 import { index as saleReturns } from '@/routes/sale-returns';
 import { index as sales } from '@/routes/sales';
-import { index as vouchers } from '@/routes/vouchers';
-import {
-    generalLedger,
-    partyLedger,
-    trialBalance,
-} from '@/routes/reports';
 import { index as stock } from '@/routes/stock';
+import { index as vouchers } from '@/routes/vouchers';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -47,11 +43,11 @@ const mainNavItems: NavItem[] = [
         href: dashboard(),
         icon: LayoutGrid,
     },
-    {
-        title: 'Categories',
-        href: categories(),
-        icon: Tags,
-    },
+    // {
+    //     title: 'Categories',
+    //     href: categories(),
+    //     icon: Tags,
+    // },
     {
         title: 'Products',
         href: products(),

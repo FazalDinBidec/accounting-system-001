@@ -5,6 +5,7 @@ namespace App\Reports;
 use App\Enums\AccountType;
 use App\Models\Account;
 use App\Models\JournalEntryLine;
+use App\Support\AccountBalance;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 

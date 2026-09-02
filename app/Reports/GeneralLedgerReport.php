@@ -4,6 +4,8 @@ namespace App\Reports;
 
 use App\Models\Account;
 use App\Models\JournalEntryLine;
+use App\Support\AccountBalance;
+use App\Support\JournalReference;
 use Illuminate\Database\Eloquent\Builder;
 
 final class GeneralLedgerReport

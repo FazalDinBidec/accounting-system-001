@@ -47,24 +47,36 @@ export default function GeneralLedger({
         value: String(item.id),
         label: item.name,
     }));
+    const hasReport = account !== null && report !== null;
 
     return (
         <>
             <Head title="General Ledger" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded p-4">
+            <div className="flex h-full flex-1 flex-col overflow-x-auto rounded p-4">
                 <Card className="overflow-hidden py-0">
                     <CardHeader className="border-b py-6">
-                        <Heading title="General Ledger" />
+                        <Heading
+                            title={
+                                hasReport ? account.name : 'General Ledger'
+                            }
+                            description={
+                                hasReport
+                                    ? (accountTypeLabels[account.type] ??
+                                      account.type)
+                                    : undefined
+                            }
+                        />
                     </CardHeader>
-                    <CardContent className="py-6">
+
+                    <CardContent className="border-b py-6">
                         <Form
                             method="get"
                             action={ReportController.generalLedger.url()}
                             preserveScroll
-                            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+                            className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] md:items-end"
                         >
-                            <div className="grid gap-2">
+                            <div className="grid min-w-0 gap-2">
                                 <Label htmlFor="account_id">Account</Label>
                                 <FormSelect
                                     id="account_id"
@@ -78,7 +90,7 @@ export default function GeneralLedger({
                                     options={accountOptions}
                                 />
                             </div>
-                            <div className="grid gap-2">
+                            <div className="grid min-w-0 gap-2">
                                 <Label htmlFor="from">From</Label>
                                 <Input
                                     id="from"
@@ -87,7 +99,7 @@ export default function GeneralLedger({
                                     defaultValue={dateInputValue(filters.from)}
                                 />
                             </div>
-                            <div className="grid gap-2">
+                            <div className="grid min-w-0 gap-2">
                                 <Label htmlFor="to">To</Label>
                                 <Input
                                     id="to"
@@ -96,116 +108,101 @@ export default function GeneralLedger({
                                     defaultValue={dateInputValue(filters.to)}
                                 />
                             </div>
-                            <div className="flex items-end">
-                                <Button
-                                    type="submit"
-                                    className="w-full sm:w-auto"
-                                >
-                                    Run report
-                                </Button>
-                            </div>
+                            <Button
+                                type="submit"
+                                className="w-full md:col-start-4 md:w-auto md:justify-self-start"
+                            >
+                                Run report
+                            </Button>
                         </Form>
                     </CardContent>
-                </Card>
 
-                {account && report ? (
-                    <Card className="overflow-hidden py-0">
-                        <CardHeader className="border-b py-6">
-                            <Heading
-                                title={account.name}
-                                description={
-                                    accountTypeLabels[account.type] ??
-                                    account.type
-                                }
-                            />
-                        </CardHeader>
-                        <CardContent className="pb-0">
-                            {report.opening !== null ? (
-                                <div className="border-b px-4 py-3 text-sm text-muted-foreground">
-                                    Opening balance:{' '}
-                                    {formatMoney(report.opening)}
-                                </div>
-                            ) : null}
+                    <CardContent className="pb-0">
+                        {hasReport ? (
+                            <>
+                                {report.opening !== null ? (
+                                    <div className="border-b px-4 py-3 text-sm text-muted-foreground">
+                                        Opening balance:{' '}
+                                        {formatMoney(report.opening)}
+                                    </div>
+                                ) : null}
 
-                            {report.rows.length === 0 ? (
-                                <p className="p-4 text-center text-sm text-muted-foreground">
-                                    No transactions in this period.
-                                </p>
-                            ) : (
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Date</TableHead>
-                                            <TableHead>Type</TableHead>
-                                            <TableHead>Reference</TableHead>
-                                            <TableHead>Party</TableHead>
-                                            <TableHead>Narration</TableHead>
-                                            <TableHead className="text-right">
-                                                Debit
-                                            </TableHead>
-                                            <TableHead className="text-right">
-                                                Credit
-                                            </TableHead>
-                                            <TableHead className="text-right">
-                                                Balance
-                                            </TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {report.rows.map((row) => (
-                                            <TableRow key={row.id}>
-                                                <TableCell>
-                                                    {dateInputValue(row.date)}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {row.type}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {row.reference}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {row.party ?? '—'}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {row.narration ?? '—'}
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    {displayAmount(row.debit)}
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    {displayAmount(row.credit)}
+                                {report.rows.length === 0 ? (
+                                    <p className="p-4 text-center text-sm text-muted-foreground">
+                                        No transactions in this period.
+                                    </p>
+                                ) : (
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>Date</TableHead>
+                                                <TableHead>Type</TableHead>
+                                                <TableHead>Reference</TableHead>
+                                                <TableHead>Party</TableHead>
+                                                <TableHead>Narration</TableHead>
+                                                <TableHead className="text-right">
+                                                    Debit
+                                                </TableHead>
+                                                <TableHead className="text-right">
+                                                    Credit
+                                                </TableHead>
+                                                <TableHead className="text-right">
+                                                    Balance
+                                                </TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {report.rows.map((row) => (
+                                                <TableRow key={row.id}>
+                                                    <TableCell>
+                                                        {dateInputValue(row.date)}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {row.type}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {row.reference}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {row.party ?? '—'}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {row.narration ?? '—'}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {displayAmount(row.debit)}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {displayAmount(row.credit)}
+                                                    </TableCell>
+                                                    <TableCell className="text-right font-medium">
+                                                        {formatMoney(row.balance)}
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                            <TableRow>
+                                                <TableCell
+                                                    colSpan={7}
+                                                    className="text-right font-medium"
+                                                >
+                                                    Closing balance
                                                 </TableCell>
                                                 <TableCell className="text-right font-medium">
-                                                    {formatMoney(row.balance)}
+                                                    {formatMoney(report.closing)}
                                                 </TableCell>
                                             </TableRow>
-                                        ))}
-                                        <TableRow>
-                                            <TableCell
-                                                colSpan={7}
-                                                className="text-right font-medium"
-                                            >
-                                                Closing balance
-                                            </TableCell>
-                                            <TableCell className="text-right font-medium">
-                                                {formatMoney(report.closing)}
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableBody>
-                                </Table>
-                            )}
-                        </CardContent>
-                    </Card>
-                ) : (
-                    <Card className="overflow-hidden py-0">
-                        <CardContent className="py-6">
-                            <p className="text-sm text-muted-foreground">
+                                        </TableBody>
+                                    </Table>
+                                )}
+                            </>
+                        ) : (
+                            <p className="py-6 text-sm text-muted-foreground">
                                 Select an account and run the report to view the
                                 ledger.
                             </p>
-                        </CardContent>
-                    </Card>
-                )}
+                        )}
+                    </CardContent>
+                </Card>
             </div>
         </>
     );

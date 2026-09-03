@@ -117,6 +117,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/party-ledger', 'partyLedger')->name('partyLedger');
             Route::get('/general-ledger', 'generalLedger')->name('generalLedger');
             Route::get('/trial-balance', 'trialBalance')->name('trialBalance');
+            Route::get('/profit-and-loss', 'profitAndLoss')->name('profitAndLoss');
             Route::get('/stock-report', 'stockReport')->name('stockReport');
         });
 

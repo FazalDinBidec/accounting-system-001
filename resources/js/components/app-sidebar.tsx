@@ -30,7 +30,7 @@ import { index as accounts } from '@/routes/accounts';
 import { index as parties } from '@/routes/parties';
 import { index as products } from '@/routes/products';
 import { index as purchases } from '@/routes/purchases';
-import { generalLedger, partyLedger, stockReport, trialBalance } from '@/routes/reports';
+import { generalLedger, partyLedger, profitAndLoss, stockReport, trialBalance } from '@/routes/reports';
 import { index as saleReturns } from '@/routes/sale-returns';
 import { index as sales } from '@/routes/sales';
 import { index as stock } from '@/routes/stock';
@@ -103,6 +103,10 @@ const mainNavItems: NavItem[] = [
             {
                 title: 'Trial Balance',
                 href: trialBalance(),
+            },
+            {
+                title: 'Profit & Loss',
+                href: profitAndLoss(),
             },
             {
                 title: 'Stock Report',

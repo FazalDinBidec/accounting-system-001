@@ -7,6 +7,7 @@ use App\Models\Party;
 use App\Models\Product;
 use App\Reports\GeneralLedgerReport;
 use App\Reports\PartyLedgerReport;
+use App\Reports\ProfitAndLossReport;
 use App\Reports\StockBatchReport;
 use App\Reports\TrialBalanceReport;
 use Illuminate\Http\Request;
@@ -98,6 +99,25 @@ class ReportController extends Controller
                 'to' => $to,
             ],
             'report' => TrialBalanceReport::for($to),
+        ]);
+    }
+
+    public function profitAndLoss(Request $request): Response
+    {
+        $validated = $request->validate([
+            'from' => ['nullable', 'date'],
+            'to' => ['nullable', 'date', 'after_or_equal:from'],
+        ]);
+
+        return Inertia::render('reports/profit-and-loss', [
+            'filters' => [
+                'from' => $validated['from'] ?? null,
+                'to' => $validated['to'] ?? null,
+            ],
+            'report' => ProfitAndLossReport::for(
+                $validated['from'] ?? null,
+                $validated['to'] ?? null,
+            ),
         ]);
     }
 

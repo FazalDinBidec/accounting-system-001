@@ -91,6 +91,24 @@ export type StockBatchReport = {
     rows: StockBatchReportRow[];
 };
 
+export type ProfitAndLossRow = {
+    id: number;
+    name: string;
+    amount: string;
+};
+
+export type ProfitAndLossSection = {
+    rows: ProfitAndLossRow[];
+    total: string;
+};
+
+export type ProfitAndLossReport = {
+    income: ProfitAndLossSection;
+    expenses: ProfitAndLossSection;
+    net: string;
+    net_label: 'Net Profit' | 'Net Loss';
+};
+
 export function displayAmount(value: string): string {
     if (value === '0.00' || value === '0') {
         return '—';

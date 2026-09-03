@@ -55,18 +55,10 @@ export default function Pagination({
             </p>
 
             {lastPage > 1 && (
-                <nav
-                    aria-label="Pagination"
-                    className="flex flex-wrap items-center gap-1"
-                >
+                <nav aria-label="Pagination" className="flex flex-wrap items-center gap-1">
                     {links.map((link, index) =>
                         link.url && !link.active ? (
-                            <Button
-                                key={`${link.label}-${index}`}
-                                variant="outline"
-                                size="sm"
-                                asChild
-                            >
+                            <Button key={`${link.label}-${index}`} variant="outline" size="sm" asChild>
                                 <Link href={link.url} preserveScroll>
                                     {decodeLabel(link.label)}
                                 </Link>

@@ -17,12 +17,7 @@ export default function VoucherEdit({
     return (
         <>
             <Head title="Edit Voucher" />
-            <VoucherForm
-                voucher={voucher}
-                parties={parties}
-                cashAccounts={cashAccounts}
-                bankAccounts={bankAccounts}
-            />
+            <VoucherForm voucher={voucher} parties={parties} cashAccounts={cashAccounts} bankAccounts={bankAccounts} />
         </>
     );
 }

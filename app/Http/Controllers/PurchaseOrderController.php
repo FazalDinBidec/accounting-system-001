@@ -6,7 +6,9 @@ use App\Models\Party;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\StockMovement;
+use App\Support\BatchNo;
 use App\Support\DocumentJournal;
+use App\Support\ProductBatchBook;
 use App\Support\ProductStock;
 use App\Support\Toast;
 use Illuminate\Database\Eloquent\Builder;
@@ -15,6 +17,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -73,7 +76,10 @@ class PurchaseOrderController extends Controller
 
     public function destroy(PurchaseOrder $purchaseOrder): RedirectResponse
     {
-        $purchaseOrder->delete();
+        DB::transaction(function () use ($purchaseOrder): void {
+            ProductBatchBook::revertPurchase($purchaseOrder);
+            $purchaseOrder->delete();
+        });
 
         Toast::success(__('Purchase deleted.'));
 
@@ -86,7 +92,7 @@ class PurchaseOrderController extends Controller
      *     date: string,
      *     notes: string|null,
      *     other_charges: mixed,
-     *     items: list<array{product_id: int, quantity: mixed, unit_price: mixed}>
+     *     items: list<array{product_id: int, batch_no: string, quantity: mixed, unit_price: mixed}>
      * }
      */
     private function validatedAttributes(Request $request): array
@@ -96,16 +102,34 @@ class PurchaseOrderController extends Controller
             'other_charges' => $request->filled('other_charges') ? $request->input('other_charges') : '0',
         ]);
 
-        return $request->validate([
+        $attributes = $request->validate([
             'party_id' => ['required', 'integer', Rule::exists(Party::class, 'id')],
             'date' => ['required', 'date'],
             'notes' => ['nullable', 'string'],
             'other_charges' => ['required', 'numeric', 'min:0'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'integer', Rule::exists(Product::class, 'id')],
+            'items.*.batch_no' => ['required', 'string', 'max:255'],
             'items.*.quantity' => ['required', 'numeric', 'gt:0'],
             'items.*.unit_price' => ['required', 'numeric', 'min:0'],
         ]);
+
+        $seen = [];
+
+        foreach ($attributes['items'] as $index => $item) {
+            $key = $item['product_id'].'|'.BatchNo::normalize($item['batch_no']);
+
+            if (isset($seen[$key])) {
+                throw ValidationException::withMessages([
+                    "items.{$index}.batch_no" => __('Duplicate batch for the same product on this purchase.'),
+                ]);
+            }
+
+            $seen[$key] = true;
+            $attributes['items'][$index]['batch_no'] = BatchNo::normalize($item['batch_no']);
+        }
+
+        return $attributes;
     }
 
     /**
@@ -114,12 +138,16 @@ class PurchaseOrderController extends Controller
      *     date: string,
      *     notes: string|null,
      *     other_charges: mixed,
-     *     items: list<array{product_id: int, quantity: mixed, unit_price: mixed}>
+     *     items: list<array{product_id: int, batch_no: string, quantity: mixed, unit_price: mixed}>
      * }  $attributes
      */
     private function persist(?PurchaseOrder $purchaseOrder, array $attributes): PurchaseOrder
     {
         return DB::transaction(function () use ($purchaseOrder, $attributes): PurchaseOrder {
+            if ($purchaseOrder !== null) {
+                ProductBatchBook::revertPurchase($purchaseOrder);
+            }
+
             $itemRows = [];
             $subTotal = '0.00';
 
@@ -128,6 +156,7 @@ class PurchaseOrderController extends Controller
                 $subTotal = bcadd($subTotal, $lineTotal, 2);
                 $itemRows[] = [
                     'product_id' => $item['product_id'],
+                    'batch_no' => $item['batch_no'],
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unit_price'],
                     'total_amount' => $lineTotal,
@@ -159,7 +188,8 @@ class PurchaseOrderController extends Controller
 
             $purchaseOrder->items()->createMany($itemRows);
             $purchaseOrder->unsetRelation('items');
-            StockMovement::syncForOrder($purchaseOrder);
+            ProductBatchBook::receiveFromPurchase($purchaseOrder);
+            StockMovement::syncForPurchase($purchaseOrder);
             DocumentJournal::syncForPurchase($purchaseOrder);
 
             return $purchaseOrder;

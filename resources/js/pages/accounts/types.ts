@@ -1,11 +1,6 @@
 import type { Paginated } from '@/components/pagination';
 
-export type AccountType =
-    | 'asset'
-    | 'liability'
-    | 'equity'
-    | 'income'
-    | 'expense';
+export type AccountType = 'asset' | 'liability' | 'equity' | 'income' | 'expense';
 
 export type AccountParentOption = {
     id: number;

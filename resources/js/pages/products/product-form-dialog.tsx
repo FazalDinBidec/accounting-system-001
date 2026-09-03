@@ -28,20 +28,12 @@ export default function ProductFormDialog({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>
-                        {isEditing ? 'Edit product' : 'Create product'}
-                    </DialogTitle>
-                    <DialogDescription>
-                        {isEditing
-                            ? 'Update this product.'
-                            : 'Add a product.'}
-                    </DialogDescription>
+                    <DialogTitle>{isEditing ? 'Edit product' : 'Create product'}</DialogTitle>
+                    <DialogDescription>{isEditing ? 'Update this product.' : 'Add a product.'}</DialogDescription>
                 </DialogHeader>
 
                 <Form
-                    {...(isEditing
-                        ? ProductController.update.form(product)
-                        : ProductController.store.form())}
+                    {...(isEditing ? ProductController.update.form(product) : ProductController.store.form())}
                     className="space-y-6"
                     options={{
                         preserveScroll: true,
@@ -51,18 +43,11 @@ export default function ProductFormDialog({
                 >
                     {({ processing, errors, resetAndClearErrors }) => (
                         <>
-                            <ProductFormFields
-                                product={product}
-                                errors={errors}
-                            />
+                            <ProductFormFields product={product} errors={errors} />
 
                             <DialogFooter>
                                 <DialogClose asChild>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() => resetAndClearErrors()}
-                                    >
+                                    <Button type="button" variant="outline" onClick={() => resetAndClearErrors()}>
                                         Cancel
                                     </Button>
                                 </DialogClose>

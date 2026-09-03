@@ -15,11 +15,7 @@ export default function PurchaseEdit({
     return (
         <>
             <Head title="Edit Purchase" />
-            <PurchaseForm
-                purchase={purchase}
-                parties={parties}
-                products={products}
-            />
+            <PurchaseForm purchase={purchase} parties={parties} products={products} />
         </>
     );
 }

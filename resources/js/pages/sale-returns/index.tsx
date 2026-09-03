@@ -7,25 +7,11 @@ import Heading from '@/components/heading';
 import Pagination from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { dateInputValue, formatMoney } from '@/pages/sale-returns/types';
-import type {
-    PaginatedSaleReturns,
-    SaleReturn,
-} from '@/pages/sale-returns/types';
+import type { PaginatedSaleReturns, SaleReturn } from '@/pages/sale-returns/types';
 
-export default function SaleReturnsIndex({
-    saleReturns,
-}: {
-    saleReturns: PaginatedSaleReturns;
-}) {
+export default function SaleReturnsIndex({ saleReturns }: { saleReturns: PaginatedSaleReturns }) {
     const [deleteReturn, setDeleteReturn] = useState<SaleReturn | null>(null);
     const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -51,9 +37,7 @@ export default function SaleReturnsIndex({
                     </CardHeader>
                     <CardContent className="pb-0">
                         {saleReturns.data.length === 0 ? (
-                            <p className="p-4 text-center text-sm text-muted-foreground">
-                                No sale returns yet.
-                            </p>
+                            <p className="p-4 text-center text-sm text-muted-foreground">No sale returns yet.</p>
                         ) : (
                             <>
                                 <Table>
@@ -64,35 +48,17 @@ export default function SaleReturnsIndex({
                                             <TableHead>Party</TableHead>
                                             <TableHead>Date</TableHead>
                                             <TableHead>Total</TableHead>
-                                            <TableHead className="text-center">
-                                                Actions
-                                            </TableHead>
+                                            <TableHead className="text-center">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {saleReturns.data.map((saleReturn) => (
                                             <TableRow key={saleReturn.id}>
-                                                <TableCell>
-                                                    {saleReturn.number}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {saleReturn.sale_order
-                                                        ?.number ?? '—'}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {saleReturn.sale_order
-                                                        ?.party?.name ?? '—'}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {dateInputValue(
-                                                        saleReturn.date,
-                                                    )}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {formatMoney(
-                                                        saleReturn.total_amount,
-                                                    )}
-                                                </TableCell>
+                                                <TableCell>{saleReturn.number}</TableCell>
+                                                <TableCell>{saleReturn.sale_order?.number ?? '—'}</TableCell>
+                                                <TableCell>{saleReturn.sale_order?.party?.name ?? '—'}</TableCell>
+                                                <TableCell>{dateInputValue(saleReturn.date)}</TableCell>
+                                                <TableCell>{formatMoney(saleReturn.total_amount)}</TableCell>
                                                 <TableCell className="text-center">
                                                     <div className="flex flex-wrap items-center justify-center gap-2">
                                                         <Button
@@ -101,31 +67,19 @@ export default function SaleReturnsIndex({
                                                             className="size-8"
                                                             asChild
                                                         >
-                                                            <Link
-                                                                href={SaleReturnController.edit.url(
-                                                                    saleReturn,
-                                                                )}
-                                                            >
+                                                            <Link href={SaleReturnController.edit.url(saleReturn)}>
                                                                 <Pencil />
-                                                                <span className="sr-only">
-                                                                    Edit
-                                                                </span>
+                                                                <span className="sr-only">Edit</span>
                                                             </Link>
                                                         </Button>
                                                         <Button
                                                             variant="destructive"
                                                             size="icon"
                                                             className="size-8"
-                                                            onClick={() =>
-                                                                openDelete(
-                                                                    saleReturn,
-                                                                )
-                                                            }
+                                                            onClick={() => openDelete(saleReturn)}
                                                         >
                                                             <Trash2 />
-                                                            <span className="sr-only">
-                                                                Delete
-                                                            </span>
+                                                            <span className="sr-only">Delete</span>
                                                         </Button>
                                                     </div>
                                                 </TableCell>
@@ -151,15 +105,9 @@ export default function SaleReturnsIndex({
                 onOpenChange={setDeleteOpen}
                 title="Delete sale return"
                 description={
-                    deleteReturn
-                        ? `Delete ${deleteReturn.number}? This cannot be undone.`
-                        : 'This cannot be undone.'
+                    deleteReturn ? `Delete ${deleteReturn.number}? This cannot be undone.` : 'This cannot be undone.'
                 }
-                action={
-                    deleteReturn
-                        ? SaleReturnController.destroy.form(deleteReturn)
-                        : undefined
-                }
+                action={deleteReturn ? SaleReturnController.destroy.form(deleteReturn) : undefined}
             />
         </>
     );

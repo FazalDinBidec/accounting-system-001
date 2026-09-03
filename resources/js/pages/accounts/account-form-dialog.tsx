@@ -25,28 +25,20 @@ export default function AccountFormDialog({
     onOpenChange: (open: boolean) => void;
 }) {
     const isEditing = account !== undefined;
-    const parentOptions = isEditing
-        ? parents.filter((parent) => parent.id !== account.id)
-        : parents;
+    const parentOptions = isEditing ? parents.filter((parent) => parent.id !== account.id) : parents;
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>
-                        {isEditing ? 'Edit account' : 'Create account'}
-                    </DialogTitle>
+                    <DialogTitle>{isEditing ? 'Edit account' : 'Create account'}</DialogTitle>
                     <DialogDescription>
-                        {isEditing
-                            ? 'Update this account. Parent is optional.'
-                            : 'Add an account. Parent is optional.'}
+                        {isEditing ? 'Update this account. Parent is optional.' : 'Add an account. Parent is optional.'}
                     </DialogDescription>
                 </DialogHeader>
 
                 <Form
-                    {...(isEditing
-                        ? AccountController.update.form(account)
-                        : AccountController.store.form())}
+                    {...(isEditing ? AccountController.update.form(account) : AccountController.store.form())}
                     className="space-y-6"
                     options={{
                         preserveScroll: true,
@@ -56,19 +48,11 @@ export default function AccountFormDialog({
                 >
                     {({ processing, errors, resetAndClearErrors }) => (
                         <>
-                            <AccountFormFields
-                                account={account}
-                                parents={parentOptions}
-                                errors={errors}
-                            />
+                            <AccountFormFields account={account} parents={parentOptions} errors={errors} />
 
                             <DialogFooter>
                                 <DialogClose asChild>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() => resetAndClearErrors()}
-                                    >
+                                    <Button type="button" variant="outline" onClick={() => resetAndClearErrors()}>
                                         Cancel
                                     </Button>
                                 </DialogClose>

@@ -3,13 +3,7 @@ import SaleOrderController from '@/actions/App/Http/Controllers/SaleOrderControl
 import SaleForm from '@/pages/sales/sale-form';
 import type { SaleOption } from '@/pages/sales/types';
 
-export default function SaleCreate({
-    parties,
-    products,
-}: {
-    parties: SaleOption[];
-    products: SaleOption[];
-}) {
+export default function SaleCreate({ parties, products }: { parties: SaleOption[]; products: SaleOption[] }) {
     return (
         <>
             <Head title="Create New Sale" />

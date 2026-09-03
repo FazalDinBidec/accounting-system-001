@@ -25,17 +25,13 @@ export default function CategoryFormDialog({
     onOpenChange: (open: boolean) => void;
 }) {
     const isEditing = category !== undefined;
-    const parentOptions = isEditing
-        ? parents.filter((parent) => parent.id !== category.id)
-        : parents;
+    const parentOptions = isEditing ? parents.filter((parent) => parent.id !== category.id) : parents;
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>
-                        {isEditing ? 'Edit category' : 'Create category'}
-                    </DialogTitle>
+                    <DialogTitle>{isEditing ? 'Edit category' : 'Create category'}</DialogTitle>
                     <DialogDescription>
                         {isEditing
                             ? 'Update this category. Parent is optional.'
@@ -44,9 +40,7 @@ export default function CategoryFormDialog({
                 </DialogHeader>
 
                 <Form
-                    {...(isEditing
-                        ? CategoryController.update.form(category)
-                        : CategoryController.store.form())}
+                    {...(isEditing ? CategoryController.update.form(category) : CategoryController.store.form())}
                     className="space-y-6"
                     options={{
                         preserveScroll: true,
@@ -56,19 +50,11 @@ export default function CategoryFormDialog({
                 >
                     {({ processing, errors, resetAndClearErrors }) => (
                         <>
-                            <CategoryFormFields
-                                category={category}
-                                parents={parentOptions}
-                                errors={errors}
-                            />
+                            <CategoryFormFields category={category} parents={parentOptions} errors={errors} />
 
                             <DialogFooter>
                                 <DialogClose asChild>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() => resetAndClearErrors()}
-                                    >
+                                    <Button type="button" variant="outline" onClick={() => resetAndClearErrors()}>
                                         Cancel
                                     </Button>
                                 </DialogClose>

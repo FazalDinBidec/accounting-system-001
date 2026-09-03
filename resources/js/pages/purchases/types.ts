@@ -10,6 +10,7 @@ export type PurchaseOrderItem = {
     id: number;
     purchase_id: number;
     product_id: number;
+    batch_no: string;
     quantity: string;
     unit_price: string;
     total_amount: string;

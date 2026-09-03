@@ -6,23 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { accountTypeLabels } from '@/pages/accounts/types';
 import type { AccountType } from '@/pages/accounts/types';
-import {
-    dateInputValue,
-    displayAmount,
-    formatMoney,
-    type GeneralLedgerReport as GeneralLedgerReportData,
-    type ReportOption,
-} from '@/pages/reports/types';
+import { dateInputValue, displayAmount, formatMoney } from '@/pages/reports/types';
+import type { GeneralLedgerReport as GeneralLedgerReportData, ReportOption } from '@/pages/reports/types';
 
 type AccountOption = ReportOption & {
     type: AccountType;
@@ -57,15 +45,8 @@ export default function GeneralLedger({
                 <Card className="overflow-hidden py-0">
                     <CardHeader className="border-b py-6">
                         <Heading
-                            title={
-                                hasReport ? account.name : 'General Ledger'
-                            }
-                            description={
-                                hasReport
-                                    ? (accountTypeLabels[account.type] ??
-                                      account.type)
-                                    : undefined
-                            }
+                            title={hasReport ? account.name : 'General Ledger'}
+                            description={hasReport ? (accountTypeLabels[account.type] ?? account.type) : undefined}
                         />
                     </CardHeader>
 
@@ -73,7 +54,7 @@ export default function GeneralLedger({
                         <Form
                             method="get"
                             action={ReportController.generalLedger.url()}
-                            preserveScroll
+                            options={{ preserveScroll: true }}
                             className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] md:items-end"
                         >
                             <div className="grid min-w-0 gap-2">
@@ -81,37 +62,20 @@ export default function GeneralLedger({
                                 <FormSelect
                                     id="account_id"
                                     name="account_id"
-                                    defaultValue={
-                                        filters.account_id
-                                            ? String(filters.account_id)
-                                            : ''
-                                    }
+                                    defaultValue={filters.account_id ? String(filters.account_id) : ''}
                                     placeholder="Select account"
                                     options={accountOptions}
                                 />
                             </div>
                             <div className="grid min-w-0 gap-2">
                                 <Label htmlFor="from">From</Label>
-                                <Input
-                                    id="from"
-                                    name="from"
-                                    type="date"
-                                    defaultValue={dateInputValue(filters.from)}
-                                />
+                                <Input id="from" name="from" type="date" defaultValue={dateInputValue(filters.from)} />
                             </div>
                             <div className="grid min-w-0 gap-2">
                                 <Label htmlFor="to">To</Label>
-                                <Input
-                                    id="to"
-                                    name="to"
-                                    type="date"
-                                    defaultValue={dateInputValue(filters.to)}
-                                />
+                                <Input id="to" name="to" type="date" defaultValue={dateInputValue(filters.to)} />
                             </div>
-                            <Button
-                                type="submit"
-                                className="w-full md:col-start-4 md:w-auto md:justify-self-start"
-                            >
+                            <Button type="submit" className="w-full md:col-start-4 md:w-auto md:justify-self-start">
                                 Run report
                             </Button>
                         </Form>
@@ -122,8 +86,7 @@ export default function GeneralLedger({
                             <>
                                 {report.opening !== null ? (
                                     <div className="border-b px-4 py-3 text-sm text-muted-foreground">
-                                        Opening balance:{' '}
-                                        {formatMoney(report.opening)}
+                                        Opening balance: {formatMoney(report.opening)}
                                     </div>
                                 ) : null}
 
@@ -140,35 +103,19 @@ export default function GeneralLedger({
                                                 <TableHead>Reference</TableHead>
                                                 <TableHead>Party</TableHead>
                                                 <TableHead>Narration</TableHead>
-                                                <TableHead className="text-right">
-                                                    Debit
-                                                </TableHead>
-                                                <TableHead className="text-right">
-                                                    Credit
-                                                </TableHead>
-                                                <TableHead className="text-right">
-                                                    Balance
-                                                </TableHead>
+                                                <TableHead className="text-right">Debit</TableHead>
+                                                <TableHead className="text-right">Credit</TableHead>
+                                                <TableHead className="text-right">Balance</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             {report.rows.map((row) => (
                                                 <TableRow key={row.id}>
-                                                    <TableCell>
-                                                        {dateInputValue(row.date)}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {row.type}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {row.reference}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {row.party ?? '—'}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {row.narration ?? '—'}
-                                                    </TableCell>
+                                                    <TableCell>{dateInputValue(row.date)}</TableCell>
+                                                    <TableCell>{row.type}</TableCell>
+                                                    <TableCell>{row.reference}</TableCell>
+                                                    <TableCell>{row.party ?? '—'}</TableCell>
+                                                    <TableCell>{row.narration ?? '—'}</TableCell>
                                                     <TableCell className="text-right">
                                                         {displayAmount(row.debit)}
                                                     </TableCell>
@@ -181,10 +128,7 @@ export default function GeneralLedger({
                                                 </TableRow>
                                             ))}
                                             <TableRow>
-                                                <TableCell
-                                                    colSpan={7}
-                                                    className="text-right font-medium"
-                                                >
+                                                <TableCell colSpan={7} className="text-right font-medium">
                                                     Closing balance
                                                 </TableCell>
                                                 <TableCell className="text-right font-medium">
@@ -196,9 +140,8 @@ export default function GeneralLedger({
                                 )}
                             </>
                         ) : (
-                            <p className="py-6 text-sm text-muted-foreground">
-                                Select an account and run the report to view the
-                                ledger.
+                            <p className="py-6 text-center text-sm text-muted-foreground">
+                                Select an account and run the report to view the ledger.
                             </p>
                         )}
                     </CardContent>

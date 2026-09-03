@@ -23,6 +23,7 @@ class PurchaseOrderItemFactory extends Factory
         return [
             'purchase_id' => PurchaseOrder::factory(),
             'product_id' => Product::factory(),
+            'batch_no' => 'BATCH-'.fake()->unique()->numerify('###'),
             'quantity' => number_format($quantity, 2, '.', ''),
             'unit_price' => number_format($unitPrice, 2, '.', ''),
             'total_amount' => number_format($quantity * $unitPrice, 2, '.', ''),

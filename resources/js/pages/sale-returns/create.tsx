@@ -3,11 +3,7 @@ import SaleReturnController from '@/actions/App/Http/Controllers/SaleReturnContr
 import SaleReturnForm from '@/pages/sale-returns/sale-return-form';
 import type { ReturnableSale } from '@/pages/sale-returns/types';
 
-export default function SaleReturnCreate({
-    sale,
-}: {
-    sale: ReturnableSale | null;
-}) {
+export default function SaleReturnCreate({ sale }: { sale: ReturnableSale | null }) {
     return (
         <>
             <Head title="Create New Sale Return" />

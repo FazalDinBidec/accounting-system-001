@@ -47,10 +47,7 @@ export default function DeleteDialog({
                                         Cancel
                                     </Button>
                                 </DialogClose>
-                                <Button
-                                    variant="destructive"
-                                    disabled={processing}
-                                >
+                                <Button variant="destructive" disabled={processing}>
                                     Yes
                                 </Button>
                             </DialogFooter>

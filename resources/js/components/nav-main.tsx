@@ -1,10 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { ChevronRight } from 'lucide-react';
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
     SidebarGroup,
     SidebarGroupLabel,
@@ -31,9 +27,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                             key={item.title}
                             asChild
                             defaultOpen={item.items.some(
-                                (child) =>
-                                    child.href !== undefined &&
-                                    isCurrentUrl(child.href),
+                                (child) => child.href !== undefined && isCurrentUrl(child.href),
                             )}
                             className="group/collapsible"
                         >
@@ -49,22 +43,10 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                     <SidebarMenuSub>
                                         {item.items.map((child) =>
                                             child.href === undefined ? null : (
-                                                <SidebarMenuSubItem
-                                                    key={child.title}
-                                                >
-                                                    <SidebarMenuSubButton
-                                                        asChild
-                                                        isActive={isCurrentUrl(
-                                                            child.href,
-                                                        )}
-                                                    >
-                                                        <Link
-                                                            href={child.href}
-                                                            prefetch
-                                                        >
-                                                            <span>
-                                                                {child.title}
-                                                            </span>
+                                                <SidebarMenuSubItem key={child.title}>
+                                                    <SidebarMenuSubButton asChild isActive={isCurrentUrl(child.href)}>
+                                                        <Link href={child.href} prefetch>
+                                                            <span>{child.title}</span>
                                                         </Link>
                                                     </SidebarMenuSubButton>
                                                 </SidebarMenuSubItem>

@@ -15,11 +15,7 @@ export default function VoucherCreate({
     return (
         <>
             <Head title="Create New Voucher" />
-            <VoucherForm
-                parties={parties}
-                cashAccounts={cashAccounts}
-                bankAccounts={bankAccounts}
-            />
+            <VoucherForm parties={parties} cashAccounts={cashAccounts} bankAccounts={bankAccounts} />
         </>
     );
 }

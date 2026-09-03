@@ -8,22 +8,11 @@ import Pagination from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import ProductFormDialog from '@/pages/products/product-form-dialog';
 import type { PaginatedProducts, Product } from '@/pages/products/types';
 
-export default function ProductsIndex({
-    products,
-}: {
-    products: PaginatedProducts;
-}) {
+export default function ProductsIndex({ products }: { products: PaginatedProducts }) {
     const [dialogProduct, setDialogProduct] = useState<Product | null>(null);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogKey, setDialogKey] = useState(0);
@@ -61,105 +50,78 @@ export default function ProductsIndex({
                         </Button>
                     </CardHeader>
                     <CardContent className="pb-0">
-                    {products.data.length === 0 ? (
-                        <p className="p-4 text-center text-sm text-muted-foreground">
-                            No products yet.
-                        </p>
-                    ) : (
-                        <>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Name</TableHead>
-                                        <TableHead>Description</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-center">
-                                            Actions
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {products.data.map((product) => (
-                                        <TableRow key={product.id}>
-                                            <TableCell>
-                                                {product.name}
-                                            </TableCell>
-                                            <TableCell className="max-w-md">
-                                                <span className="line-clamp-2">
-                                                    {product.description ?? '—'}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Form
-                                                    {...ProductController.toggleStatus.form(
-                                                        product,
-                                                    )}
-                                                    options={{
-                                                        preserveScroll: true,
-                                                    }}
-                                                >
-                                                    {({
-                                                        processing,
-                                                        submit,
-                                                    }) => (
-                                                        <Switch
-                                                            checked={
-                                                                product.is_active
-                                                            }
-                                                            disabled={
-                                                                processing
-                                                            }
-                                                            onCheckedChange={() =>
-                                                                submit()
-                                                            }
-                                                            aria-label={`Toggle status for ${product.name}`}
-                                                        />
-                                                    )}
-                                                </Form>
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <div className="flex flex-wrap items-center justify-center gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="icon"
-                                                        className="size-8"
-                                                        onClick={() =>
-                                                            openEdit(product)
-                                                        }
-                                                    >
-                                                        <Pencil />
-                                                        <span className="sr-only">
-                                                            Edit
-                                                        </span>
-                                                    </Button>
-                                                    <Button
-                                                        variant="destructive"
-                                                        size="icon"
-                                                        className="size-8"
-                                                        onClick={() =>
-                                                            openDelete(product)
-                                                        }
-                                                    >
-                                                        <Trash2 />
-                                                        <span className="sr-only">
-                                                            Delete
-                                                        </span>
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
+                        {products.data.length === 0 ? (
+                            <p className="p-4 text-center text-sm text-muted-foreground">No products yet.</p>
+                        ) : (
+                            <>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Name</TableHead>
+                                            <TableHead>Description</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead className="text-center">Actions</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                            <Pagination
-                                links={products.links}
-                                from={products.from}
-                                to={products.to}
-                                total={products.total}
-                                lastPage={products.last_page}
-                            />
-                        </>
-                    )}
+                                    </TableHeader>
+                                    <TableBody>
+                                        {products.data.map((product) => (
+                                            <TableRow key={product.id}>
+                                                <TableCell>{product.name}</TableCell>
+                                                <TableCell className="max-w-md">
+                                                    <span className="line-clamp-2">{product.description ?? '—'}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Form
+                                                        {...ProductController.toggleStatus.form(product)}
+                                                        options={{
+                                                            preserveScroll: true,
+                                                        }}
+                                                    >
+                                                        {({ processing, submit }) => (
+                                                            <Switch
+                                                                checked={product.is_active}
+                                                                disabled={processing}
+                                                                onCheckedChange={() => submit()}
+                                                                aria-label={`Toggle status for ${product.name}`}
+                                                            />
+                                                        )}
+                                                    </Form>
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    <div className="flex flex-wrap items-center justify-center gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="icon"
+                                                            className="size-8"
+                                                            onClick={() => openEdit(product)}
+                                                        >
+                                                            <Pencil />
+                                                            <span className="sr-only">Edit</span>
+                                                        </Button>
+                                                        <Button
+                                                            variant="destructive"
+                                                            size="icon"
+                                                            className="size-8"
+                                                            onClick={() => openDelete(product)}
+                                                        >
+                                                            <Trash2 />
+                                                            <span className="sr-only">Delete</span>
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                                <Pagination
+                                    links={products.links}
+                                    from={products.from}
+                                    to={products.to}
+                                    total={products.total}
+                                    lastPage={products.last_page}
+                                />
+                            </>
+                        )}
                     </CardContent>
                 </Card>
             </div>
@@ -176,15 +138,9 @@ export default function ProductsIndex({
                 onOpenChange={setDeleteOpen}
                 title="Delete product"
                 description={
-                    deleteProduct
-                        ? `Delete ${deleteProduct.name}? This cannot be undone.`
-                        : 'This cannot be undone.'
+                    deleteProduct ? `Delete ${deleteProduct.name}? This cannot be undone.` : 'This cannot be undone.'
                 }
-                action={
-                    deleteProduct
-                        ? ProductController.destroy.form(deleteProduct)
-                        : undefined
-                }
+                action={deleteProduct ? ProductController.destroy.form(deleteProduct) : undefined}
             />
         </>
     );

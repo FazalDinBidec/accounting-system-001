@@ -5,7 +5,7 @@ export function formatMoney(value: string | number): string {
 }
 
 export function dateInputValue(value: string | null | undefined): string {
-    if (! value) {
+    if (!value) {
         return '';
     }
 
@@ -76,6 +76,19 @@ export type TrialBalanceReport = {
         debit: string;
         credit: string;
     };
+};
+
+export type StockBatchReportRow = {
+    id: number;
+    product_id: number;
+    product_name: string;
+    batch_no: string;
+    quantity_on_hand: string;
+    parties: string;
+};
+
+export type StockBatchReport = {
+    rows: StockBatchReportRow[];
 };
 
 export function displayAmount(value: string): string {

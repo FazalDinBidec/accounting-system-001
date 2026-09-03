@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Database\Factories\SaleOrderItemFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -19,7 +21,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read SaleOrder $saleOrder
- * @property-read Product $product
+ * @property-read Collection<int, SaleOrderItemBatch> $batchAllocations
  */
 #[Fillable(['sale_id', 'product_id', 'quantity', 'unit_price', 'total_amount'])]
 class SaleOrderItem extends Model
@@ -47,6 +49,14 @@ class SaleOrderItem extends Model
     public function saleOrder(): BelongsTo
     {
         return $this->belongsTo(SaleOrder::class, 'sale_id');
+    }
+
+    /**
+     * @return HasMany<SaleOrderItemBatch, $this>
+     */
+    public function batchAllocations(): HasMany
+    {
+        return $this->hasMany(SaleOrderItemBatch::class);
     }
 
     /**

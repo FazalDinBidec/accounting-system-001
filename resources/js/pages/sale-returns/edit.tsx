@@ -3,13 +3,7 @@ import SaleReturnController from '@/actions/App/Http/Controllers/SaleReturnContr
 import SaleReturnForm from '@/pages/sale-returns/sale-return-form';
 import type { ReturnableSale, SaleReturn } from '@/pages/sale-returns/types';
 
-export default function SaleReturnEdit({
-    saleReturn,
-    sale,
-}: {
-    saleReturn: SaleReturn;
-    sale: ReturnableSale;
-}) {
+export default function SaleReturnEdit({ saleReturn, sale }: { saleReturn: SaleReturn; sale: ReturnableSale }) {
     return (
         <>
             <Head title="Edit Sale Return" />

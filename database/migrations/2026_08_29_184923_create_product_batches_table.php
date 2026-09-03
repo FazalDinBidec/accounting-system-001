@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('purchase_order_items', function (Blueprint $table) {
+        Schema::create('product_batches', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('purchase_id')->index()->constrained('purchase_orders')->cascadeOnDelete();
             $table->foreignId('product_id')->index()->constrained()->restrictOnDelete();
             $table->string('batch_no');
-            $table->decimal('quantity', 12, 2);
-            $table->decimal('unit_price', 15, 2);
-            $table->decimal('total_amount', 15, 2);
+            $table->decimal('quantity_on_hand', 12, 2);
+            $table->date('purchased_at')->index();
             $table->timestamps();
+
+            $table->unique(['product_id', 'batch_no']);
         });
     }
 
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('purchase_order_items');
+        Schema::dropIfExists('product_batches');
     }
 };

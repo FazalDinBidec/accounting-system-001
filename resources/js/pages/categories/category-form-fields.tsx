@@ -33,9 +33,7 @@ export default function CategoryFormFields({
                 <FormSelect
                     id="parent_id"
                     name="parent_id"
-                    defaultValue={
-                        category?.parent_id ? String(category.parent_id) : ''
-                    }
+                    defaultValue={category?.parent_id ? String(category.parent_id) : ''}
                     emptyLabel="None"
                     options={parents.map((parent) => ({
                         value: String(parent.id),

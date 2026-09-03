@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\BatchNo;
 use Database\Factories\PurchaseOrderItemFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,6 +14,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int $purchase_id
  * @property int $product_id
+ * @property string $batch_no
  * @property string $quantity
  * @property string $unit_price
  * @property string $total_amount
@@ -21,11 +23,18 @@ use Illuminate\Support\Carbon;
  * @property-read PurchaseOrder $purchaseOrder
  * @property-read Product $product
  */
-#[Fillable(['purchase_id', 'product_id', 'quantity', 'unit_price', 'total_amount'])]
+#[Fillable(['purchase_id', 'product_id', 'batch_no', 'quantity', 'unit_price', 'total_amount'])]
 class PurchaseOrderItem extends Model
 {
     /** @use HasFactory<PurchaseOrderItemFactory> */
     use HasFactory;
+
+    protected static function booted(): void
+    {
+        static::saving(function (PurchaseOrderItem $item): void {
+            $item->batch_no = BatchNo::normalize($item->batch_no);
+        });
+    }
 
     /**
      * @return array<string, string>

@@ -29,12 +29,7 @@ export default function PartyFormFields({
 
             <div className="grid gap-2">
                 <Label htmlFor="phone">Phone</Label>
-                <Input
-                    id="phone"
-                    name="phone"
-                    defaultValue={party?.phone ?? ''}
-                    placeholder="Optional phone"
-                />
+                <Input id="phone" name="phone" defaultValue={party?.phone ?? ''} placeholder="Optional phone" />
                 <InputError message={errors.phone} />
             </div>
 

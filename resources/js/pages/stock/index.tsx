@@ -5,22 +5,11 @@ import Heading from '@/components/heading';
 import Pagination from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatQty } from '@/pages/stock/types';
 import type { PaginatedStock } from '@/pages/stock/types';
 
-export default function StockIndex({
-    products,
-}: {
-    products: PaginatedStock;
-}) {
+export default function StockIndex({ products }: { products: PaginatedStock }) {
     return (
         <>
             <Head title="Stock" />
@@ -32,9 +21,7 @@ export default function StockIndex({
                     </CardHeader>
                     <CardContent className="pb-0">
                         {products.data.length === 0 ? (
-                            <p className="p-4 text-center text-sm text-muted-foreground">
-                                No products yet.
-                            </p>
+                            <p className="p-4 text-center text-sm text-muted-foreground">No products yet.</p>
                         ) : (
                             <>
                                 <Table>
@@ -45,47 +32,24 @@ export default function StockIndex({
                                             <TableHead>Sold</TableHead>
                                             <TableHead>Returned</TableHead>
                                             <TableHead>On hand</TableHead>
-                                            <TableHead className="text-center">
-                                                Actions
-                                            </TableHead>
+                                            <TableHead>Batches</TableHead>
+                                            <TableHead className="text-center">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {products.data.map((product) => (
                                             <TableRow key={product.id}>
-                                                <TableCell>
-                                                    {product.name}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {formatQty(
-                                                        product.purchased,
-                                                    )}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {formatQty(product.sold)}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {formatQty(product.returned)}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {formatQty(product.on_hand)}
-                                                </TableCell>
+                                                <TableCell>{product.name}</TableCell>
+                                                <TableCell>{formatQty(product.purchased)}</TableCell>
+                                                <TableCell>{formatQty(product.sold)}</TableCell>
+                                                <TableCell>{formatQty(product.returned)}</TableCell>
+                                                <TableCell>{formatQty(product.on_hand)}</TableCell>
+                                                <TableCell>{product.batch_count}</TableCell>
                                                 <TableCell className="text-center">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="icon"
-                                                        className="size-8"
-                                                        asChild
-                                                    >
-                                                        <Link
-                                                            href={StockController.show.url(
-                                                                product,
-                                                            )}
-                                                        >
+                                                    <Button variant="outline" size="icon" className="size-8" asChild>
+                                                        <Link href={StockController.show.url(product)}>
                                                             <Eye />
-                                                            <span className="sr-only">
-                                                                History
-                                                            </span>
+                                                            <span className="sr-only">History</span>
                                                         </Link>
                                                     </Button>
                                                 </TableCell>

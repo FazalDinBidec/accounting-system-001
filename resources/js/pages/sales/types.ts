@@ -6,6 +6,12 @@ export type SaleOption = {
     on_hand: string;
 };
 
+export type SaleBatchAllocation = {
+    product_batch_id: number;
+    batch_no: string;
+    quantity: string;
+};
+
 export type SaleOrderItem = {
     id: number;
     sale_id: number;
@@ -13,6 +19,7 @@ export type SaleOrderItem = {
     quantity: string;
     unit_price: string;
     total_amount: string;
+    batches?: SaleBatchAllocation[];
 };
 
 export type SaleOrder = {
@@ -30,6 +37,12 @@ export type SaleOrder = {
 
 export type PaginatedSales = Paginated<SaleOrder>;
 
+export type AvailableBatch = {
+    product_batch_id: number;
+    batch_no: string;
+    quantity_on_hand: string;
+};
+
 export function toMoneyNumber(value: string | number): number {
     const amount = Number(value);
 
@@ -42,4 +55,10 @@ export function formatMoney(value: string | number): string {
 
 export function dateInputValue(value: string): string {
     return value.slice(0, 10);
+}
+
+export function formatQty(value: string | number): string {
+    const amount = Number(value);
+
+    return Number.isFinite(amount) ? amount.toFixed(2) : '0.00';
 }

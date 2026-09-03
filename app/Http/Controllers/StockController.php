@@ -23,6 +23,7 @@ class StockController extends Controller
                 'id' => $product->id,
                 'name' => $product->name,
             ],
+            'batches' => ProductStock::batchesFor($product),
             'movements' => ProductStock::history($product),
         ]);
     }

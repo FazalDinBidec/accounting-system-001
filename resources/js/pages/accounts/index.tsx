@@ -8,21 +8,10 @@ import Pagination from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AccountFormDialog from '@/pages/accounts/account-form-dialog';
 import { accountTypeLabels } from '@/pages/accounts/types';
-import type {
-    Account,
-    AccountParentOption,
-    PaginatedAccounts,
-} from '@/pages/accounts/types';
+import type { Account, AccountParentOption, PaginatedAccounts } from '@/pages/accounts/types';
 
 export default function AccountsIndex({
     accounts,
@@ -77,9 +66,7 @@ export default function AccountsIndex({
                     </CardHeader>
                     <CardContent className="pb-0">
                         {accounts.data.length === 0 ? (
-                            <p className="p-4 text-center text-sm text-muted-foreground">
-                                No accounts yet.
-                            </p>
+                            <p className="p-4 text-center text-sm text-muted-foreground">No accounts yet.</p>
                         ) : (
                             <>
                                 <Table>
@@ -89,52 +76,27 @@ export default function AccountsIndex({
                                             <TableHead>Type</TableHead>
                                             <TableHead>Parent</TableHead>
                                             <TableHead>Status</TableHead>
-                                            <TableHead className="text-center">
-                                                Actions
-                                            </TableHead>
+                                            <TableHead className="text-center">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {accounts.data.map((account) => (
                                             <TableRow key={account.id}>
-                                                <TableCell>
-                                                    {account.name}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {
-                                                        accountTypeLabels[
-                                                            account.type
-                                                        ]
-                                                    }
-                                                </TableCell>
-                                                <TableCell>
-                                                    {account.parent?.name ??
-                                                        '—'}
-                                                </TableCell>
+                                                <TableCell>{account.name}</TableCell>
+                                                <TableCell>{accountTypeLabels[account.type]}</TableCell>
+                                                <TableCell>{account.parent?.name ?? '—'}</TableCell>
                                                 <TableCell>
                                                     <Form
-                                                        {...AccountController.toggleStatus.form(
-                                                            account,
-                                                        )}
+                                                        {...AccountController.toggleStatus.form(account)}
                                                         options={{
                                                             preserveScroll: true,
                                                         }}
                                                     >
-                                                        {({
-                                                            processing,
-                                                            submit,
-                                                        }) => (
+                                                        {({ processing, submit }) => (
                                                             <Switch
-                                                                checked={
-                                                                    account.is_active
-                                                                }
-                                                                disabled={
-                                                                    processing ||
-                                                                    account.is_system
-                                                                }
-                                                                onCheckedChange={() =>
-                                                                    submit()
-                                                                }
+                                                                checked={account.is_active}
+                                                                disabled={processing || account.is_system}
+                                                                onCheckedChange={() => submit()}
                                                                 aria-label={`Toggle status for ${account.name}`}
                                                             />
                                                         )}
@@ -142,40 +104,26 @@ export default function AccountsIndex({
                                                 </TableCell>
                                                 <TableCell className="text-center">
                                                     {account.is_system ? (
-                                                        <span className="text-sm text-muted-foreground">
-                                                            System
-                                                        </span>
+                                                        <span className="text-sm text-muted-foreground">System</span>
                                                     ) : (
                                                         <div className="flex flex-wrap items-center justify-center gap-2">
                                                             <Button
                                                                 variant="outline"
                                                                 size="icon"
                                                                 className="size-8"
-                                                                onClick={() =>
-                                                                    openEdit(
-                                                                        account,
-                                                                    )
-                                                                }
+                                                                onClick={() => openEdit(account)}
                                                             >
                                                                 <Pencil />
-                                                                <span className="sr-only">
-                                                                    Edit
-                                                                </span>
+                                                                <span className="sr-only">Edit</span>
                                                             </Button>
                                                             <Button
                                                                 variant="destructive"
                                                                 size="icon"
                                                                 className="size-8"
-                                                                onClick={() =>
-                                                                    openDelete(
-                                                                        account,
-                                                                    )
-                                                                }
+                                                                onClick={() => openDelete(account)}
                                                             >
                                                                 <Trash2 />
-                                                                <span className="sr-only">
-                                                                    Delete
-                                                                </span>
+                                                                <span className="sr-only">Delete</span>
                                                             </Button>
                                                         </div>
                                                     )}
@@ -210,15 +158,9 @@ export default function AccountsIndex({
                 onOpenChange={setDeleteOpen}
                 title="Delete account"
                 description={
-                    deleteAccount
-                        ? `Delete ${deleteAccount.name}? This cannot be undone.`
-                        : 'This cannot be undone.'
+                    deleteAccount ? `Delete ${deleteAccount.name}? This cannot be undone.` : 'This cannot be undone.'
                 }
-                action={
-                    deleteAccount
-                        ? AccountController.destroy.form(deleteAccount)
-                        : undefined
-                }
+                action={deleteAccount ? AccountController.destroy.form(deleteAccount) : undefined}
             />
         </>
     );

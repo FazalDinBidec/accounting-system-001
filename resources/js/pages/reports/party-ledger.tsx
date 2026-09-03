@@ -6,21 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import {
-    dateInputValue,
-    displayAmount,
-    formatMoney,
-    type PartyLedgerReport as PartyLedgerReportData,
-    type ReportOption,
-} from '@/pages/reports/types';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { dateInputValue, displayAmount, formatMoney } from '@/pages/reports/types';
+import type { PartyLedgerReport as PartyLedgerReportData, ReportOption } from '@/pages/reports/types';
 
 export default function PartyLedger({
     parties,
@@ -51,14 +39,8 @@ export default function PartyLedger({
                 <Card className="overflow-hidden py-0">
                     <CardHeader className="border-b py-6">
                         <Heading
-                            title={
-                                hasReport ? party.name : 'Party Ledger'
-                            }
-                            description={
-                                hasReport
-                                    ? 'Receivable, payable, and net balance by transaction.'
-                                    : undefined
-                            }
+                            title={hasReport ? party.name : 'Party Ledger'}
+                            description={hasReport ? 'Receivable, payable, and net balance by transaction.' : undefined}
                         />
                     </CardHeader>
 
@@ -66,7 +48,7 @@ export default function PartyLedger({
                         <Form
                             method="get"
                             action={ReportController.partyLedger.url()}
-                            preserveScroll
+                            options={{ preserveScroll: true }}
                             className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] md:items-end"
                         >
                             <div className="grid min-w-0 gap-2">
@@ -74,37 +56,20 @@ export default function PartyLedger({
                                 <FormSelect
                                     id="party_id"
                                     name="party_id"
-                                    defaultValue={
-                                        filters.party_id
-                                            ? String(filters.party_id)
-                                            : ''
-                                    }
+                                    defaultValue={filters.party_id ? String(filters.party_id) : ''}
                                     placeholder="Select party"
                                     options={partyOptions}
                                 />
                             </div>
                             <div className="grid min-w-0 gap-2">
                                 <Label htmlFor="from">From</Label>
-                                <Input
-                                    id="from"
-                                    name="from"
-                                    type="date"
-                                    defaultValue={dateInputValue(filters.from)}
-                                />
+                                <Input id="from" name="from" type="date" defaultValue={dateInputValue(filters.from)} />
                             </div>
                             <div className="grid min-w-0 gap-2">
                                 <Label htmlFor="to">To</Label>
-                                <Input
-                                    id="to"
-                                    name="to"
-                                    type="date"
-                                    defaultValue={dateInputValue(filters.to)}
-                                />
+                                <Input id="to" name="to" type="date" defaultValue={dateInputValue(filters.to)} />
                             </div>
-                            <Button
-                                type="submit"
-                                className="w-full md:col-start-4 md:w-auto md:justify-self-start"
-                            >
+                            <Button type="submit" className="w-full md:col-start-4 md:w-auto md:justify-self-start">
                                 Run report
                             </Button>
                         </Form>
@@ -115,11 +80,8 @@ export default function PartyLedger({
                             <>
                                 {report.opening ? (
                                     <div className="border-b px-4 py-3 text-sm text-muted-foreground">
-                                        Opening balance — Receivable:{' '}
-                                        {formatMoney(report.opening.receivable)},{' '}
-                                        Payable:{' '}
-                                        {formatMoney(report.opening.payable)}, Net:{' '}
-                                        {formatMoney(report.opening.net)}
+                                        Opening balance — Receivable: {formatMoney(report.opening.receivable)}, Payable:{' '}
+                                        {formatMoney(report.opening.payable)}, Net: {formatMoney(report.opening.net)}
                                     </div>
                                 ) : null}
 
@@ -135,38 +97,20 @@ export default function PartyLedger({
                                                 <TableHead>Type</TableHead>
                                                 <TableHead>Reference</TableHead>
                                                 <TableHead>Account</TableHead>
-                                                <TableHead className="text-right">
-                                                    Debit
-                                                </TableHead>
-                                                <TableHead className="text-right">
-                                                    Credit
-                                                </TableHead>
-                                                <TableHead className="text-right">
-                                                    Receivable
-                                                </TableHead>
-                                                <TableHead className="text-right">
-                                                    Payable
-                                                </TableHead>
-                                                <TableHead className="text-right">
-                                                    Net
-                                                </TableHead>
+                                                <TableHead className="text-right">Debit</TableHead>
+                                                <TableHead className="text-right">Credit</TableHead>
+                                                <TableHead className="text-right">Receivable</TableHead>
+                                                <TableHead className="text-right">Payable</TableHead>
+                                                <TableHead className="text-right">Net</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             {report.rows.map((row) => (
                                                 <TableRow key={row.id}>
-                                                    <TableCell>
-                                                        {dateInputValue(row.date)}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {row.type}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {row.reference}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {row.account}
-                                                    </TableCell>
+                                                    <TableCell>{dateInputValue(row.date)}</TableCell>
+                                                    <TableCell>{row.type}</TableCell>
+                                                    <TableCell>{row.reference}</TableCell>
+                                                    <TableCell>{row.account}</TableCell>
                                                     <TableCell className="text-right">
                                                         {displayAmount(row.debit)}
                                                     </TableCell>
@@ -174,9 +118,7 @@ export default function PartyLedger({
                                                         {displayAmount(row.credit)}
                                                     </TableCell>
                                                     <TableCell className="text-right">
-                                                        {formatMoney(
-                                                            row.receivable,
-                                                        )}
+                                                        {formatMoney(row.receivable)}
                                                     </TableCell>
                                                     <TableCell className="text-right">
                                                         {formatMoney(row.payable)}
@@ -187,26 +129,17 @@ export default function PartyLedger({
                                                 </TableRow>
                                             ))}
                                             <TableRow>
-                                                <TableCell
-                                                    colSpan={6}
-                                                    className="text-right font-medium"
-                                                >
+                                                <TableCell colSpan={6} className="text-right font-medium">
                                                     Closing balance
                                                 </TableCell>
                                                 <TableCell className="text-right font-medium">
-                                                    {formatMoney(
-                                                        report.closing.receivable,
-                                                    )}
+                                                    {formatMoney(report.closing.receivable)}
                                                 </TableCell>
                                                 <TableCell className="text-right font-medium">
-                                                    {formatMoney(
-                                                        report.closing.payable,
-                                                    )}
+                                                    {formatMoney(report.closing.payable)}
                                                 </TableCell>
                                                 <TableCell className="text-right font-medium">
-                                                    {formatMoney(
-                                                        report.closing.net,
-                                                    )}
+                                                    {formatMoney(report.closing.net)}
                                                 </TableCell>
                                             </TableRow>
                                         </TableBody>
@@ -214,9 +147,8 @@ export default function PartyLedger({
                                 )}
                             </>
                         ) : (
-                            <p className="py-6 text-sm text-muted-foreground">
-                                Select a party and run the report to view the
-                                ledger.
+                            <p className="py-6 text-center text-sm text-muted-foreground">
+                                Select a party and run the report to view the ledger.
                             </p>
                         )}
                     </CardContent>

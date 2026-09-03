@@ -7,6 +7,7 @@ use App\Models\SaleOrderItem;
 use App\Models\SaleReturn;
 use App\Models\StockMovement;
 use App\Support\DocumentJournal;
+use App\Support\ProductBatchBook;
 use App\Support\SaleReturnQuantities;
 use App\Support\Toast;
 use Illuminate\Database\Eloquent\Builder;
@@ -108,7 +109,10 @@ class SaleReturnController extends Controller
 
     public function destroy(SaleReturn $saleReturn): RedirectResponse
     {
-        $saleReturn->delete();
+        DB::transaction(function () use ($saleReturn): void {
+            ProductBatchBook::revertSaleReturn($saleReturn);
+            $saleReturn->delete();
+        });
 
         Toast::success(__('Sale return deleted.'));
 
@@ -184,6 +188,9 @@ class SaleReturnController extends Controller
     private function persist(?SaleReturn $saleReturn, array $attributes): SaleReturn
     {
         return DB::transaction(function () use ($saleReturn, $attributes): SaleReturn {
+            if ($saleReturn !== null) {
+                ProductBatchBook::revertSaleReturn($saleReturn);
+            }
             $itemRows = [];
             $subTotal = '0.00';
 
@@ -223,7 +230,9 @@ class SaleReturnController extends Controller
 
             $saleReturn->items()->createMany($itemRows);
             $saleReturn->unsetRelation('items');
-            StockMovement::syncForOrder($saleReturn);
+            $saleReturn->load('items.saleOrderItem.batchAllocations');
+            ProductBatchBook::restoreFromSaleReturn($saleReturn);
+            StockMovement::syncForSaleReturn($saleReturn);
             DocumentJournal::syncForSaleReturn($saleReturn);
 
             return $saleReturn;

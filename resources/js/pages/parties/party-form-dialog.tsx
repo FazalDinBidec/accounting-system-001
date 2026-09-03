@@ -28,18 +28,12 @@ export default function PartyFormDialog({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>
-                        {isEditing ? 'Edit party' : 'Create party'}
-                    </DialogTitle>
-                    <DialogDescription>
-                        {isEditing ? 'Update this party.' : 'Add a party.'}
-                    </DialogDescription>
+                    <DialogTitle>{isEditing ? 'Edit party' : 'Create party'}</DialogTitle>
+                    <DialogDescription>{isEditing ? 'Update this party.' : 'Add a party.'}</DialogDescription>
                 </DialogHeader>
 
                 <Form
-                    {...(isEditing
-                        ? PartyController.update.form(party)
-                        : PartyController.store.form())}
+                    {...(isEditing ? PartyController.update.form(party) : PartyController.store.form())}
                     className="space-y-6"
                     options={{
                         preserveScroll: true,
@@ -53,11 +47,7 @@ export default function PartyFormDialog({
 
                             <DialogFooter>
                                 <DialogClose asChild>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() => resetAndClearErrors()}
-                                    >
+                                    <Button type="button" variant="outline" onClick={() => resetAndClearErrors()}>
                                         Cancel
                                     </Button>
                                 </DialogClose>

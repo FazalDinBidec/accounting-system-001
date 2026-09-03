@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Account;
 use App\Models\Party;
+use App\Models\Product;
 use App\Reports\GeneralLedgerReport;
 use App\Reports\PartyLedgerReport;
+use App\Reports\StockBatchReport;
 use App\Reports\TrialBalanceReport;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -96,6 +98,32 @@ class ReportController extends Controller
                 'to' => $to,
             ],
             'report' => TrialBalanceReport::for($to),
+        ]);
+    }
+
+    public function stockReport(Request $request): Response
+    {
+        $request->merge([
+            'product_id' => $request->filled('product_id') ? $request->integer('product_id') : null,
+            'party_id' => $request->filled('party_id') ? $request->integer('party_id') : null,
+        ]);
+
+        $validated = $request->validate([
+            'product_id' => ['nullable', 'integer', 'exists:products,id'],
+            'party_id' => ['nullable', 'integer', 'exists:parties,id'],
+        ]);
+
+        $productId = isset($validated['product_id']) ? (int) $validated['product_id'] : null;
+        $partyId = isset($validated['party_id']) ? (int) $validated['party_id'] : null;
+
+        return Inertia::render('reports/stock-report', [
+            'products' => Product::query()->orderBy('name')->get(['id', 'name']),
+            'parties' => Party::query()->orderBy('name')->get(['id', 'name']),
+            'filters' => [
+                'product_id' => $productId,
+                'party_id' => $partyId,
+            ],
+            'report' => StockBatchReport::for($productId, $partyId),
         ]);
     }
 }

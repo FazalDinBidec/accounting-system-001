@@ -7,6 +7,23 @@ export type StockSummary = {
     sold: string;
     returned: string;
     on_hand: string;
+    batch_count: number;
+};
+
+export type StockBatchPurchaseHistory = {
+    purchase_order_id: number;
+    number: string;
+    party_name: string;
+    date: string;
+    quantity: string;
+};
+
+export type StockBatchRow = {
+    id: number;
+    batch_no: string;
+    quantity_on_hand: string;
+    purchased_at: string;
+    purchase_history: StockBatchPurchaseHistory[];
 };
 
 export type StockMovementRow = {
@@ -14,6 +31,7 @@ export type StockMovementRow = {
     date: string;
     type: string;
     number: string;
+    batch_no: string | null;
     quantity_in: string;
     quantity_out: string;
     balance: string;

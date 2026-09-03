@@ -8,20 +8,9 @@ import Pagination from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import CategoryFormDialog from '@/pages/categories/category-form-dialog';
-import type {
-    Category,
-    CategoryParentOption,
-    PaginatedCategories,
-} from '@/pages/categories/types';
+import type { Category, CategoryParentOption, PaginatedCategories } from '@/pages/categories/types';
 
 export default function CategoriesIndex({
     categories,
@@ -68,9 +57,7 @@ export default function CategoriesIndex({
                     </CardHeader>
                     <CardContent className="pb-0">
                         {categories.data.length === 0 ? (
-                            <p className="p-4 text-center text-sm text-muted-foreground">
-                                No categories yet.
-                            </p>
+                            <p className="p-4 text-center text-sm text-muted-foreground">No categories yet.</p>
                         ) : (
                             <>
                                 <Table>
@@ -79,45 +66,26 @@ export default function CategoriesIndex({
                                             <TableHead>Name</TableHead>
                                             <TableHead>Parent</TableHead>
                                             <TableHead>Status</TableHead>
-                                            <TableHead className="text-center">
-                                                Actions
-                                            </TableHead>
+                                            <TableHead className="text-center">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {categories.data.map((category) => (
                                             <TableRow key={category.id}>
-                                                <TableCell>
-                                                    {category.name}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {category.parent?.name ??
-                                                        '—'}
-                                                </TableCell>
+                                                <TableCell>{category.name}</TableCell>
+                                                <TableCell>{category.parent?.name ?? '—'}</TableCell>
                                                 <TableCell>
                                                     <Form
-                                                        {...CategoryController.toggleStatus.form(
-                                                            category,
-                                                        )}
+                                                        {...CategoryController.toggleStatus.form(category)}
                                                         options={{
                                                             preserveScroll: true,
                                                         }}
                                                     >
-                                                        {({
-                                                            processing,
-                                                            submit,
-                                                        }) => (
+                                                        {({ processing, submit }) => (
                                                             <Switch
-                                                                checked={
-                                                                    category.status ===
-                                                                    'active'
-                                                                }
-                                                                disabled={
-                                                                    processing
-                                                                }
-                                                                onCheckedChange={() =>
-                                                                    submit()
-                                                                }
+                                                                checked={category.status === 'active'}
+                                                                disabled={processing}
+                                                                onCheckedChange={() => submit()}
                                                                 aria-label={`Toggle status for ${category.name}`}
                                                             />
                                                         )}
@@ -129,31 +97,19 @@ export default function CategoriesIndex({
                                                             variant="outline"
                                                             size="icon"
                                                             className="size-8"
-                                                            onClick={() =>
-                                                                openEdit(
-                                                                    category,
-                                                                )
-                                                            }
+                                                            onClick={() => openEdit(category)}
                                                         >
                                                             <Pencil />
-                                                            <span className="sr-only">
-                                                                Edit
-                                                            </span>
+                                                            <span className="sr-only">Edit</span>
                                                         </Button>
                                                         <Button
                                                             variant="destructive"
                                                             size="icon"
                                                             className="size-8"
-                                                            onClick={() =>
-                                                                openDelete(
-                                                                    category,
-                                                                )
-                                                            }
+                                                            onClick={() => openDelete(category)}
                                                         >
                                                             <Trash2 />
-                                                            <span className="sr-only">
-                                                                Delete
-                                                            </span>
+                                                            <span className="sr-only">Delete</span>
                                                         </Button>
                                                     </div>
                                                 </TableCell>
@@ -187,15 +143,9 @@ export default function CategoriesIndex({
                 onOpenChange={setDeleteOpen}
                 title="Delete category"
                 description={
-                    deleteCategory
-                        ? `Delete ${deleteCategory.name}? This cannot be undone.`
-                        : 'This cannot be undone.'
+                    deleteCategory ? `Delete ${deleteCategory.name}? This cannot be undone.` : 'This cannot be undone.'
                 }
-                action={
-                    deleteCategory
-                        ? CategoryController.destroy.form(deleteCategory)
-                        : undefined
-                }
+                action={deleteCategory ? CategoryController.destroy.form(deleteCategory) : undefined}
             />
         </>
     );

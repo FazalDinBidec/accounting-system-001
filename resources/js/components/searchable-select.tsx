@@ -32,10 +32,7 @@ export default function SearchableSelect({
 
     useEffect(() => {
         function handleClick(event: MouseEvent): void {
-            if (
-                rootRef.current !== null &&
-                !rootRef.current.contains(event.target as Node)
-            ) {
+            if (rootRef.current !== null && !rootRef.current.contains(event.target as Node)) {
                 setOpen(false);
             }
         }
@@ -60,10 +57,7 @@ export default function SearchableSelect({
         return () => window.clearTimeout(timeout);
     }, [open, query, disabled, onSearch]);
 
-    const shownLabel =
-        displayLabel !== undefined && displayLabel !== ''
-            ? displayLabel
-            : placeholder;
+    const shownLabel = displayLabel !== undefined && displayLabel !== '' ? displayLabel : placeholder;
 
     return (
         <div ref={rootRef} className="relative">
@@ -92,13 +86,9 @@ export default function SearchableSelect({
                     />
                     <div className="max-h-56 overflow-y-auto">
                         {searching && options.length === 0 ? (
-                            <p className="px-2 py-1.5 text-sm text-muted-foreground">
-                                Loading...
-                            </p>
+                            <p className="px-2 py-1.5 text-sm text-muted-foreground">Loading...</p>
                         ) : options.length === 0 ? (
-                            <p className="px-2 py-1.5 text-sm text-muted-foreground">
-                                No results.
-                            </p>
+                            <p className="px-2 py-1.5 text-sm text-muted-foreground">No results.</p>
                         ) : (
                             options.map((option) => (
                                 <button

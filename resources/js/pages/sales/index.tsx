@@ -7,14 +7,7 @@ import Heading from '@/components/heading';
 import Pagination from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { dateInputValue, formatMoney } from '@/pages/sales/types';
 import type { PaginatedSales, SaleOrder } from '@/pages/sales/types';
 
@@ -43,86 +36,64 @@ export default function SalesIndex({ sales }: { sales: PaginatedSales }) {
                         </Button>
                     </CardHeader>
                     <CardContent className="pb-0">
-                    {sales.data.length === 0 ? (
-                        <p className="p-4 text-center text-sm text-muted-foreground">
-                            No sales yet.
-                        </p>
-                    ) : (
-                        <>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Number</TableHead>
-                                        <TableHead>Party</TableHead>
-                                        <TableHead>Date</TableHead>
-                                        <TableHead>Total</TableHead>
-                                        <TableHead className="text-center">
-                                            Actions
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {sales.data.map((sale) => (
-                                        <TableRow key={sale.id}>
-                                            <TableCell>
-                                                {sale.number}
-                                            </TableCell>
-                                            <TableCell>
-                                                {sale.party?.name ?? '—'}
-                                            </TableCell>
-                                            <TableCell>
-                                                {dateInputValue(sale.date)}
-                                            </TableCell>
-                                            <TableCell>
-                                                {formatMoney(sale.total_amount)}
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <div className="flex flex-wrap items-center justify-center gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="icon"
-                                                        className="size-8"
-                                                        asChild
-                                                    >
-                                                        <Link
-                                                            href={SaleOrderController.edit.url(
-                                                                sale,
-                                                            )}
-                                                        >
-                                                            <Pencil />
-                                                            <span className="sr-only">
-                                                                Edit
-                                                            </span>
-                                                        </Link>
-                                                    </Button>
-                                                    <Button
-                                                        variant="destructive"
-                                                        size="icon"
-                                                        className="size-8"
-                                                        onClick={() =>
-                                                            openDelete(sale)
-                                                        }
-                                                    >
-                                                        <Trash2 />
-                                                        <span className="sr-only">
-                                                            Delete
-                                                        </span>
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
+                        {sales.data.length === 0 ? (
+                            <p className="p-4 text-center text-sm text-muted-foreground">No sales yet.</p>
+                        ) : (
+                            <>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Number</TableHead>
+                                            <TableHead>Party</TableHead>
+                                            <TableHead>Date</TableHead>
+                                            <TableHead>Total</TableHead>
+                                            <TableHead className="text-center">Actions</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                            <Pagination
-                                links={sales.links}
-                                from={sales.from}
-                                to={sales.to}
-                                total={sales.total}
-                                lastPage={sales.last_page}
-                            />
-                        </>
-                    )}
+                                    </TableHeader>
+                                    <TableBody>
+                                        {sales.data.map((sale) => (
+                                            <TableRow key={sale.id}>
+                                                <TableCell>{sale.number}</TableCell>
+                                                <TableCell>{sale.party?.name ?? '—'}</TableCell>
+                                                <TableCell>{dateInputValue(sale.date)}</TableCell>
+                                                <TableCell>{formatMoney(sale.total_amount)}</TableCell>
+                                                <TableCell className="text-center">
+                                                    <div className="flex flex-wrap items-center justify-center gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="icon"
+                                                            className="size-8"
+                                                            asChild
+                                                        >
+                                                            <Link href={SaleOrderController.edit.url(sale)}>
+                                                                <Pencil />
+                                                                <span className="sr-only">Edit</span>
+                                                            </Link>
+                                                        </Button>
+                                                        <Button
+                                                            variant="destructive"
+                                                            size="icon"
+                                                            className="size-8"
+                                                            onClick={() => openDelete(sale)}
+                                                        >
+                                                            <Trash2 />
+                                                            <span className="sr-only">Delete</span>
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                                <Pagination
+                                    links={sales.links}
+                                    from={sales.from}
+                                    to={sales.to}
+                                    total={sales.total}
+                                    lastPage={sales.last_page}
+                                />
+                            </>
+                        )}
                     </CardContent>
                 </Card>
             </div>
@@ -132,15 +103,9 @@ export default function SalesIndex({ sales }: { sales: PaginatedSales }) {
                 onOpenChange={setDeleteOpen}
                 title="Delete sale"
                 description={
-                    deleteSale
-                        ? `Delete ${deleteSale.number}? This cannot be undone.`
-                        : 'This cannot be undone.'
+                    deleteSale ? `Delete ${deleteSale.number}? This cannot be undone.` : 'This cannot be undone.'
                 }
-                action={
-                    deleteSale
-                        ? SaleOrderController.destroy.form(deleteSale)
-                        : undefined
-                }
+                action={deleteSale ? SaleOrderController.destroy.form(deleteSale) : undefined}
             />
         </>
     );

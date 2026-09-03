@@ -57,6 +57,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
+            Route::get('/suggest-batches', 'suggestBatches')->name('suggestBatches');
             Route::post('/', 'store')->name('store');
             Route::get('/{saleOrder}/edit', 'edit')->name('edit');
             Route::put('/{saleOrder}', 'update')->name('update');
@@ -116,6 +117,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/party-ledger', 'partyLedger')->name('partyLedger');
             Route::get('/general-ledger', 'generalLedger')->name('generalLedger');
             Route::get('/trial-balance', 'trialBalance')->name('trialBalance');
+            Route::get('/stock-report', 'stockReport')->name('stockReport');
         });
 
     Route::prefix('accounts')

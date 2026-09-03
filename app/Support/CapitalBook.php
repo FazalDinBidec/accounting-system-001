@@ -2,15 +2,16 @@
 
 namespace App\Support;
 
+use App\Enums\CapitalTransactionType;
 use App\Enums\VoucherMethod;
-use App\Enums\VoucherType;
 use App\Models\Account;
-use App\Models\Voucher;
-use App\Models\VoucherLine;
+use App\Models\CapitalTransaction;
+use App\Models\CapitalTransactionLine;
+use App\Models\Party;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
-final class VoucherBook
+final class CapitalBook
 {
     /**
      * @param  array{
@@ -29,16 +30,20 @@ final class VoucherBook
      *     }>
      * }  $attributes
      */
-    public function persist(?Voucher $voucher, array $attributes): Voucher
+    public function persist(?CapitalTransaction $transaction, array $attributes): CapitalTransaction
     {
-        return DB::transaction(function () use ($voucher, $attributes): Voucher {
+        return DB::transaction(function () use ($transaction, $attributes): CapitalTransaction {
             PeriodGuard::assertDateIsPostable($attributes['date']);
 
-            if ($voucher !== null) {
-                PeriodGuard::assertDateIsPostable($voucher->date->toDateString());
+            $type = CapitalTransactionType::from($attributes['type']);
+            $party = Party::query()->findOrFail($attributes['party_id']);
+
+            if (! $party->is_partner) {
+                throw ValidationException::withMessages([
+                    'party_id' => __('Select a partner.'),
+                ]);
             }
 
-            $type = VoucherType::from($attributes['type']);
             $lineRows = [];
             $total = '0.00';
 
@@ -70,55 +75,75 @@ final class VoucherBook
                 ];
             }
 
+            if ($type === CapitalTransactionType::Withdrawal) {
+                $exclude = $transaction;
+                $balance = CapitalBalance::for($party);
+
+                if ($exclude !== null && $exclude->exists) {
+                    $balance = bcadd($balance, (string) $exclude->amount, 2);
+                }
+
+                if (bccomp($total, $balance, 2) === 1) {
+                    throw ValidationException::withMessages([
+                        'lines.0.amount' => __('Payout exceeds partner capital balance.'),
+                    ]);
+                }
+            }
+
             $payload = [
                 'type' => $type,
-                'party_id' => $attributes['party_id'],
+                'party_id' => $party->id,
                 'date' => $attributes['date'],
                 'amount' => $total,
                 'notes' => $attributes['notes'] ?? null,
             ];
 
-            if ($voucher === null) {
-                $voucher = Voucher::query()->create([
+            if ($transaction === null) {
+                $transaction = CapitalTransaction::query()->create([
                     ...$payload,
                     'number' => 'DRAFT',
                 ]);
-                $prefix = $type === VoucherType::Receipt ? 'RCP-' : 'PAY-';
-                $voucher->update([
-                    'number' => $prefix.str_pad((string) $voucher->id, 5, '0', STR_PAD_LEFT),
+                $prefix = $type === CapitalTransactionType::Introduction ? 'CIN-' : 'CPY-';
+                $transaction->update([
+                    'number' => $prefix.str_pad((string) $transaction->id, 5, '0', STR_PAD_LEFT),
                 ]);
             } else {
-                $voucher->update($payload);
-                $voucher->lines()->delete();
+                PeriodGuard::assertDateIsPostable($transaction->date->toDateString());
+                $transaction->update($payload);
+                $transaction->lines()->delete();
             }
 
-            $voucher->lines()->createMany($lineRows);
-            $voucher->unsetRelation('lines');
-            $voucher->load(['party', 'lines.account']);
+            $transaction->lines()->createMany($lineRows);
+            $transaction->unsetRelation('lines');
+            $transaction->load(['party', 'lines.account']);
 
-            $this->syncJournal($voucher);
+            $this->syncJournal($transaction);
 
-            return $voucher;
+            return $transaction;
         });
     }
 
-    private function syncJournal(Voucher $voucher): void
+    private function syncJournal(CapitalTransaction $transaction): void
     {
-        DocumentJournal::forget($voucher);
+        DocumentJournal::forget($transaction);
 
-        if (bccomp((string) $voucher->amount, '0', 2) !== 1) {
+        if (bccomp((string) $transaction->amount, '0', 2) !== 1) {
             return;
         }
 
         $builder = JournalEntryBuilder::make()
-            ->date($voucher->date)
-            ->narration(($voucher->type === VoucherType::Receipt ? 'Receipt ' : 'Payment ').$voucher->number)
-            ->journalable($voucher);
+            ->date($transaction->date)
+            ->narration(
+                ($transaction->type === CapitalTransactionType::Introduction ? 'Capital intro ' : 'Capital payout ')
+                .$transaction->number,
+            )
+            ->journalable($transaction);
 
-        $party = $voucher->party;
+        $party = $transaction->party;
+        $capitalAccount = SystemAccounts::partnersCapital();
 
-        if ($voucher->type === VoucherType::Receipt) {
-            foreach ($voucher->lines as $line) {
+        if ($transaction->type === CapitalTransactionType::Introduction) {
+            foreach ($transaction->lines as $line) {
                 $builder->debit(
                     account: $line->account,
                     amount: $line->amount,
@@ -127,18 +152,18 @@ final class VoucherBook
             }
 
             $builder->credit(
-                account: SystemAccounts::partyReceivables(),
-                amount: $voucher->amount,
+                account: $capitalAccount,
+                amount: $transaction->amount,
                 party: $party,
             );
         } else {
             $builder->debit(
-                account: SystemAccounts::partyPayables(),
-                amount: $voucher->amount,
+                account: $capitalAccount,
+                amount: $transaction->amount,
                 party: $party,
             );
 
-            foreach ($voucher->lines as $line) {
+            foreach ($transaction->lines as $line) {
                 $builder->credit(
                     account: $line->account,
                     amount: $line->amount,
@@ -150,7 +175,7 @@ final class VoucherBook
         $builder->post();
     }
 
-    private function lineNarration(VoucherLine $line): ?string
+    private function lineNarration(CapitalTransactionLine $line): ?string
     {
         if ($line->method !== VoucherMethod::Bank) {
             return null;

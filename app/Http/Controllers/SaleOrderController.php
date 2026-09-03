@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\SaleOrder;
 use App\Models\StockMovement;
 use App\Support\DocumentJournal;
+use App\Support\PeriodGuard;
 use App\Support\ProductBatchBook;
 use App\Support\ProductStock;
 use App\Support\Toast;
@@ -86,6 +87,8 @@ class SaleOrderController extends Controller
 
             return back();
         }
+
+        PeriodGuard::assertDateIsPostable($saleOrder->date->toDateString());
 
         DB::transaction(function () use ($saleOrder): void {
             ProductBatchBook::revertSale($saleOrder);
@@ -190,7 +193,10 @@ class SaleOrderController extends Controller
     private function persist(?SaleOrder $saleOrder, array $attributes): SaleOrder
     {
         return DB::transaction(function () use ($saleOrder, $attributes): SaleOrder {
+            PeriodGuard::assertDateIsPostable($attributes['date']);
+
             if ($saleOrder !== null) {
+                PeriodGuard::assertDateIsPostable($saleOrder->date->toDateString());
                 ProductBatchBook::revertSale($saleOrder);
             }
 

@@ -11,14 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('parties', function (Blueprint $table) {
+        Schema::create('fiscal_years', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('phone')->nullable();
-            $table->text('address')->nullable();
-            $table->boolean('is_active')->default(true)->index();
-            $table->boolean('is_partner')->default(false)->index();
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->boolean('is_active')->default(false)->index();
+            $table->boolean('is_closed')->default(false)->index();
+            $table->timestamp('closed_at')->nullable();
             $table->timestamps();
+
+            $table->unique(['start_date', 'end_date']);
         });
     }
 
@@ -27,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('parties');
+        Schema::dropIfExists('fiscal_years');
     }
 };

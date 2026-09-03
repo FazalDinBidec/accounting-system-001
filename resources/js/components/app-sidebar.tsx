@@ -1,6 +1,8 @@
 import { Link } from '@inertiajs/react';
 import {
+    CalendarRange,
     FileChartColumn,
+    HandCoins,
     Receipt,
     Landmark,
     LayoutGrid,
@@ -8,7 +10,6 @@ import {
     ShoppingBag,
     ShoppingCart,
     Undo2,
-    // Tags,
     Users,
     Warehouse,
 } from 'lucide-react';
@@ -26,91 +27,132 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as accounts } from '@/routes/accounts';
-// import { index as categories } from '@/routes/categories';
+import { index as capital } from '@/routes/capital';
+import { index as fiscalYears } from '@/routes/fiscal-years';
 import { index as parties } from '@/routes/parties';
 import { index as products } from '@/routes/products';
 import { index as purchases } from '@/routes/purchases';
-import { generalLedger, partyLedger, profitAndLoss, stockReport, trialBalance } from '@/routes/reports';
+import {
+    balanceSheet,
+    capitalSummary,
+    generalLedger,
+    partyLedger,
+    profitAndLoss,
+    stockReport,
+    trialBalance,
+} from '@/routes/reports';
 import { index as saleReturns } from '@/routes/sale-returns';
 import { index as sales } from '@/routes/sales';
 import { index as stock } from '@/routes/stock';
 import { index as vouchers } from '@/routes/vouchers';
-import type { NavItem } from '@/types';
+import type { NavGroup } from '@/types';
 
-const mainNavItems: NavItem[] = [
+const navGroups: NavGroup[] = [
     {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    // {
-    //     title: 'Categories',
-    //     href: categories(),
-    //     icon: Tags,
-    // },
-    {
-        title: 'Products',
-        href: products(),
-        icon: Package,
-    },
-    {
-        title: 'Purchases',
-        href: purchases(),
-        icon: ShoppingCart,
-    },
-    {
-        title: 'Sales',
-        href: sales(),
-        icon: ShoppingBag,
-    },
-    {
-        title: 'Sale Returns',
-        href: saleReturns(),
-        icon: Undo2,
-    },
-    {
-        title: 'Vouchers',
-        href: vouchers(),
-        icon: Receipt,
-    },
-    {
-        title: 'Stock',
-        href: stock(),
-        icon: Warehouse,
-    },
-    {
-        title: 'Parties',
-        href: parties(),
-        icon: Users,
-    },
-    {
-        title: 'Accounts',
-        href: accounts(),
-        icon: Landmark,
-    },
-    {
-        title: 'Reports',
-        icon: FileChartColumn,
         items: [
             {
-                title: 'Party Ledger',
-                href: partyLedger(),
+                title: 'Dashboard',
+                href: dashboard(),
+                icon: LayoutGrid,
+            },
+        ],
+    },
+    {
+        label: 'Operations',
+        items: [
+            {
+                title: 'Purchases',
+                href: purchases(),
+                icon: ShoppingCart,
             },
             {
-                title: 'General Ledger',
-                href: generalLedger(),
+                title: 'Sales',
+                href: sales(),
+                icon: ShoppingBag,
             },
             {
-                title: 'Trial Balance',
-                href: trialBalance(),
+                title: 'Sale Returns',
+                href: saleReturns(),
+                icon: Undo2,
             },
             {
-                title: 'Profit & Loss',
-                href: profitAndLoss(),
+                title: 'Stock',
+                href: stock(),
+                icon: Warehouse,
+            },
+        ],
+    },
+    {
+        label: 'Finance',
+        items: [
+            {
+                title: 'Vouchers',
+                href: vouchers(),
+                icon: Receipt,
             },
             {
-                title: 'Stock Report',
-                href: stockReport(),
+                title: 'Capital Tranx',
+                href: capital(),
+                icon: HandCoins,
+            },
+            {
+                title: 'Parties',
+                href: parties(),
+                icon: Users,
+            },
+            {
+                title: 'Accounts',
+                href: accounts(),
+                icon: Landmark,
+            },
+            {
+                title: 'Reports',
+                icon: FileChartColumn,
+                items: [
+                    {
+                        title: 'Party Ledger',
+                        href: partyLedger(),
+                    },
+                    {
+                        title: 'General Ledger',
+                        href: generalLedger(),
+                    },
+                    {
+                        title: 'Trial Balance',
+                        href: trialBalance(),
+                    },
+                    {
+                        title: 'Profit & Loss',
+                        href: profitAndLoss(),
+                    },
+                    {
+                        title: 'Balance Sheet',
+                        href: balanceSheet(),
+                    },
+                    {
+                        title: 'Capital Summary',
+                        href: capitalSummary(),
+                    },
+                    {
+                        title: 'Stock Report',
+                        href: stockReport(),
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        label: 'Management',
+        items: [
+            {
+                title: 'Products',
+                href: products(),
+                icon: Package,
+            },
+            {
+                title: 'Fiscal Years',
+                href: fiscalYears(),
+                icon: CalendarRange,
             },
         ],
     },
@@ -132,7 +174,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain groups={navGroups} />
             </SidebarContent>
 
             <SidebarFooter>

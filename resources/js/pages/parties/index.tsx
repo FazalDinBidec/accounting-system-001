@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { dateInputValue, formatMoney } from '@/pages/reports/types';
 import PartyFormDialog from '@/pages/parties/party-form-dialog';
 import type { PaginatedParties, Party } from '@/pages/parties/types';
 
@@ -59,6 +60,8 @@ export default function PartiesIndex({ parties }: { parties: PaginatedParties })
                                         <TableRow>
                                             <TableHead>Name</TableHead>
                                             <TableHead>Phone</TableHead>
+                                            <TableHead>Partner</TableHead>
+                                            <TableHead>Capital</TableHead>
                                             <TableHead>Address</TableHead>
                                             <TableHead>Status</TableHead>
                                             <TableHead className="text-center">Actions</TableHead>
@@ -69,6 +72,12 @@ export default function PartiesIndex({ parties }: { parties: PaginatedParties })
                                             <TableRow key={party.id}>
                                                 <TableCell>{party.name}</TableCell>
                                                 <TableCell>{party.phone ?? '—'}</TableCell>
+                                                <TableCell>{party.is_partner ? 'Yes' : 'No'}</TableCell>
+                                                <TableCell>
+                                                    {party.is_partner && party.capital_balance
+                                                        ? formatMoney(party.capital_balance)
+                                                        : '—'}
+                                                </TableCell>
                                                 <TableCell className="max-w-md">
                                                     <span className="line-clamp-2">{party.address ?? '—'}</span>
                                                 </TableCell>

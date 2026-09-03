@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Account;
+use App\Models\FiscalYear;
 use App\Models\Party;
 use App\Models\Product;
+use App\Reports\BalanceSheetReport;
+use App\Reports\CapitalBalanceReport;
 use App\Reports\GeneralLedgerReport;
 use App\Reports\PartyLedgerReport;
 use App\Reports\ProfitAndLossReport;
@@ -104,20 +107,61 @@ class ReportController extends Controller
 
     public function profitAndLoss(Request $request): Response
     {
+        $defaults = $this->fiscalYearDefaults();
+
         $validated = $request->validate([
             'from' => ['nullable', 'date'],
             'to' => ['nullable', 'date', 'after_or_equal:from'],
         ]);
 
+        $from = $validated['from'] ?? $defaults['from'];
+        $to = $validated['to'] ?? $defaults['to'];
+
         return Inertia::render('reports/profit-and-loss', [
             'filters' => [
-                'from' => $validated['from'] ?? null,
-                'to' => $validated['to'] ?? null,
+                'from' => $from,
+                'to' => $to,
             ],
-            'report' => ProfitAndLossReport::for(
-                $validated['from'] ?? null,
-                $validated['to'] ?? null,
-            ),
+            'report' => ProfitAndLossReport::for($from, $to, excludeClosing: true),
+        ]);
+    }
+
+    public function balanceSheet(Request $request): Response
+    {
+        $defaults = $this->fiscalYearDefaults();
+
+        $validated = $request->validate([
+            'to' => ['nullable', 'date'],
+        ]);
+
+        $to = $validated['to'] ?? $defaults['to'];
+
+        return Inertia::render('reports/balance-sheet', [
+            'filters' => [
+                'to' => $to,
+            ],
+            'report' => BalanceSheetReport::for($to),
+        ]);
+    }
+
+    public function capitalSummary(Request $request): Response
+    {
+        $defaults = $this->fiscalYearDefaults();
+
+        $validated = $request->validate([
+            'from' => ['nullable', 'date'],
+            'to' => ['nullable', 'date', 'after_or_equal:from'],
+        ]);
+
+        $from = $validated['from'] ?? $defaults['from'];
+        $to = $validated['to'] ?? $defaults['to'];
+
+        return Inertia::render('reports/capital-summary', [
+            'filters' => [
+                'from' => $from,
+                'to' => $to,
+            ],
+            'report' => CapitalBalanceReport::for($from, $to),
         ]);
     }
 
@@ -145,5 +189,25 @@ class ReportController extends Controller
             ],
             'report' => StockBatchReport::for($productId, $partyId),
         ]);
+    }
+
+    /**
+     * @return array{from: string|null, to: string|null}
+     */
+    private function fiscalYearDefaults(): array
+    {
+        $fiscalYear = FiscalYear::query()->active()->first();
+
+        if ($fiscalYear === null) {
+            return [
+                'from' => null,
+                'to' => null,
+            ];
+        }
+
+        return [
+            'from' => $fiscalYear->start_date->toDateString(),
+            'to' => today()->toDateString(),
+        ];
     }
 }

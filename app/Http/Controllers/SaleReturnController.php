@@ -7,6 +7,7 @@ use App\Models\SaleOrderItem;
 use App\Models\SaleReturn;
 use App\Models\StockMovement;
 use App\Support\DocumentJournal;
+use App\Support\PeriodGuard;
 use App\Support\ProductBatchBook;
 use App\Support\SaleReturnQuantities;
 use App\Support\Toast;
@@ -109,6 +110,8 @@ class SaleReturnController extends Controller
 
     public function destroy(SaleReturn $saleReturn): RedirectResponse
     {
+        PeriodGuard::assertDateIsPostable($saleReturn->date->toDateString());
+
         DB::transaction(function () use ($saleReturn): void {
             ProductBatchBook::revertSaleReturn($saleReturn);
             $saleReturn->delete();
@@ -188,7 +191,10 @@ class SaleReturnController extends Controller
     private function persist(?SaleReturn $saleReturn, array $attributes): SaleReturn
     {
         return DB::transaction(function () use ($saleReturn, $attributes): SaleReturn {
+            PeriodGuard::assertDateIsPostable($attributes['date']);
+
             if ($saleReturn !== null) {
+                PeriodGuard::assertDateIsPostable($saleReturn->date->toDateString());
                 ProductBatchBook::revertSaleReturn($saleReturn);
             }
             $itemRows = [];

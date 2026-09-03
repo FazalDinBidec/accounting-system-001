@@ -26,7 +26,7 @@ export default function PartyFormDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
+            <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>{isEditing ? 'Edit party' : 'Create party'}</DialogTitle>
                     <DialogDescription>{isEditing ? 'Update this party.' : 'Add a party.'}</DialogDescription>

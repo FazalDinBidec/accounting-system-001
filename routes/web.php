@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\CapitalController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\FiscalYearController;
 use App\Http\Controllers\PartyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseOrderController;
@@ -110,6 +112,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/{party}', 'destroy')->name('destroy');
         });
 
+    Route::prefix('capital')
+        ->name('capital.')
+        ->controller(CapitalController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::get('/partner-balance/{party}', 'partnerBalance')->name('partnerBalance');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{capitalTransaction}/edit', 'edit')->name('edit');
+            Route::put('/{capitalTransaction}', 'update')->name('update');
+            Route::delete('/{capitalTransaction}', 'destroy')->name('destroy');
+        });
+
+    Route::prefix('fiscal-years')
+        ->name('fiscal-years.')
+        ->controller(FiscalYearController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('/', 'store')->name('store');
+            Route::patch('/{fiscalYear}/activate', 'activate')->name('activate');
+            Route::post('/periods/{fiscalPeriod}/close', 'closePeriod')->name('closePeriod');
+            Route::post('/{fiscalYear}/close', 'closeYear')->name('closeYear');
+        });
+
     Route::prefix('reports')
         ->name('reports.')
         ->controller(ReportController::class)
@@ -118,6 +144,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/general-ledger', 'generalLedger')->name('generalLedger');
             Route::get('/trial-balance', 'trialBalance')->name('trialBalance');
             Route::get('/profit-and-loss', 'profitAndLoss')->name('profitAndLoss');
+            Route::get('/balance-sheet', 'balanceSheet')->name('balanceSheet');
+            Route::get('/capital-summary', 'capitalSummary')->name('capitalSummary');
             Route::get('/stock-report', 'stockReport')->name('stockReport');
         });
 

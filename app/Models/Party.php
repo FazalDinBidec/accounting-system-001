@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $phone
  * @property string|null $address
  * @property bool $is_active
+ * @property bool $is_partner
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Collection<int, JournalEntryLine> $journalEntryLines
@@ -23,7 +24,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, PurchaseOrder> $purchaseOrders
  * @property-read Collection<int, SaleOrder> $saleOrders
  */
-#[Fillable(['name', 'phone', 'address', 'is_active'])]
+#[Fillable(['name', 'phone', 'address', 'is_active', 'is_partner'])]
 class Party extends Model
 {
     /** @use HasFactory<PartyFactory> */
@@ -34,6 +35,7 @@ class Party extends Model
      */
     protected $attributes = [
         'is_active' => true,
+        'is_partner' => false,
     ];
 
     /**
@@ -43,6 +45,7 @@ class Party extends Model
     {
         return [
             'is_active' => 'boolean',
+            'is_partner' => 'boolean',
         ];
     }
 
@@ -68,6 +71,14 @@ class Party extends Model
     public function vouchers(): HasMany
     {
         return $this->hasMany(Voucher::class);
+    }
+
+    /**
+     * @return HasMany<CapitalTransaction, $this>
+     */
+    public function capitalTransactions(): HasMany
+    {
+        return $this->hasMany(CapitalTransaction::class);
     }
 
     /**

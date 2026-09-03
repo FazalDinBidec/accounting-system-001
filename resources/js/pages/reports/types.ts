@@ -109,6 +109,37 @@ export type ProfitAndLossReport = {
     net_label: 'Net Profit' | 'Net Loss';
 };
 
+export type BalanceSheetRow = {
+    id: number;
+    name: string;
+    amount: string;
+    party_name?: string | null;
+};
+
+export type BalanceSheetReport = {
+    assets: { rows: BalanceSheetRow[]; total: string };
+    liabilities: { rows: BalanceSheetRow[]; total: string };
+    equity: { rows: BalanceSheetRow[]; total: string };
+    totals: { liabilities_and_equity: string };
+};
+
+export type CapitalSummaryRow = {
+    party_id: number;
+    party_name: string;
+    allocated: string;
+    withdrawn: string;
+    balance: string;
+};
+
+export type CapitalSummaryReport = {
+    rows: CapitalSummaryRow[];
+    totals: {
+        allocated: string;
+        withdrawn: string;
+        balance: string;
+    };
+};
+
 export function displayAmount(value: string): string {
     if (value === '0.00' || value === '0') {
         return '—';

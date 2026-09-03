@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CapitalTransactionType;
 use App\Enums\VoucherMethod;
-use App\Enums\VoucherType;
 use App\Models\Account;
+use App\Models\CapitalTransaction;
+use App\Models\CapitalTransactionLine;
 use App\Models\Party;
-use App\Models\Voucher;
-use App\Models\VoucherLine;
-use App\Support\PartyBalance;
+use App\Support\CapitalBalance;
+use App\Support\CapitalBook;
 use App\Support\PeriodGuard;
 use App\Support\SystemAccounts;
 use App\Support\Toast;
-use App\Support\VoucherBook;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
@@ -22,22 +22,22 @@ use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class VoucherController extends Controller
+class CapitalController extends Controller
 {
-    public function __construct(private VoucherBook $voucherBook) {}
+    public function __construct(private CapitalBook $capitalBook) {}
 
     public function index(Request $request): Response
     {
         $type = $request->string('type')->toString();
 
-        return Inertia::render('vouchers/index', [
+        return Inertia::render('capital/index', [
             'filters' => [
-                'type' => in_array($type, [VoucherType::Receipt->value, VoucherType::Payment->value], true) ? $type : '',
+                'type' => in_array($type, [CapitalTransactionType::Introduction->value, CapitalTransactionType::Withdrawal->value], true) ? $type : '',
             ],
-            'vouchers' => Voucher::query()
+            'transactions' => CapitalTransaction::query()
                 ->with(['party:id,name', 'lines.account:id,name'])
                 ->when(
-                    $type === VoucherType::Receipt->value || $type === VoucherType::Payment->value,
+                    $type === CapitalTransactionType::Introduction->value || $type === CapitalTransactionType::Withdrawal->value,
                     function (Builder $query) use ($type): void {
                         $query->where('type', $type);
                     },
@@ -50,8 +50,8 @@ class VoucherController extends Controller
 
     public function create(): Response
     {
-        return Inertia::render('vouchers/create', [
-            'parties' => $this->partyOptions(),
+        return Inertia::render('capital/create', [
+            'partners' => $this->partnerOptions(),
             'cashAccounts' => $this->methodAccounts(VoucherMethod::Cash),
             'bankAccounts' => $this->methodAccounts(VoucherMethod::Bank),
         ]);
@@ -59,66 +59,73 @@ class VoucherController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $this->voucherBook->persist(null, $this->validatedAttributes($request));
+        $this->capitalBook->persist(null, $this->validatedAttributes($request));
 
-        Toast::success(__('Voucher created.'));
+        Toast::success(__('Capital transaction created.'));
 
-        return to_route('vouchers.index');
+        return to_route('capital.index');
     }
 
-    public function edit(Voucher $voucher): Response
+    public function edit(CapitalTransaction $capitalTransaction): Response
     {
-        $voucher->load('lines');
+        $capitalTransaction->load('lines');
 
-        return Inertia::render('vouchers/edit', [
-            'voucher' => $voucher,
-            'parties' => $this->partyOptions($voucher->party_id),
+        return Inertia::render('capital/edit', [
+            'transaction' => $capitalTransaction,
+            'partners' => $this->partnerOptions($capitalTransaction->party_id),
             'cashAccounts' => $this->methodAccounts(
                 VoucherMethod::Cash,
-                $voucher->lines
-                    ->filter(fn (VoucherLine $line): bool => $line->method === VoucherMethod::Cash)
+                $capitalTransaction->lines
+                    ->filter(fn (CapitalTransactionLine $line): bool => $line->method === VoucherMethod::Cash)
                     ->pluck('account_id')
                     ->all(),
             ),
             'bankAccounts' => $this->methodAccounts(
                 VoucherMethod::Bank,
-                $voucher->lines
-                    ->filter(fn (VoucherLine $line): bool => $line->method === VoucherMethod::Bank)
+                $capitalTransaction->lines
+                    ->filter(fn (CapitalTransactionLine $line): bool => $line->method === VoucherMethod::Bank)
                     ->pluck('account_id')
                     ->all(),
             ),
         ]);
     }
 
-    public function update(Request $request, Voucher $voucher): RedirectResponse
+    public function update(Request $request, CapitalTransaction $capitalTransaction): RedirectResponse
     {
         $request->merge([
-            'type' => $voucher->type->value,
+            'type' => $capitalTransaction->type->value,
         ]);
 
-        $this->voucherBook->persist($voucher, $this->validatedAttributes($request));
+        $this->capitalBook->persist($capitalTransaction, $this->validatedAttributes($request));
 
-        Toast::success(__('Voucher updated.'));
+        Toast::success(__('Capital transaction updated.'));
 
-        return to_route('vouchers.index');
+        return to_route('capital.index');
     }
 
-    public function destroy(Voucher $voucher): RedirectResponse
+    public function destroy(CapitalTransaction $capitalTransaction): RedirectResponse
     {
-        PeriodGuard::assertDateIsPostable($voucher->date->toDateString());
-        $voucher->delete();
+        PeriodGuard::assertDateIsPostable($capitalTransaction->date->toDateString());
+        $capitalTransaction->delete();
 
-        Toast::success(__('Voucher deleted.'));
+        Toast::success(__('Capital transaction deleted.'));
 
-        return to_route('vouchers.index');
+        return to_route('capital.index');
     }
 
-    public function partyBalance(Request $request, Party $party): JsonResponse
+    public function partnerBalance(Request $request, Party $party): JsonResponse
     {
-        $excludeId = $request->integer('exclude_voucher_id');
-        $exclude = $excludeId > 0 ? Voucher::query()->find($excludeId) : null;
+        $excludeId = $request->integer('exclude_transaction_id');
+        $exclude = $excludeId > 0 ? CapitalTransaction::query()->find($excludeId) : null;
+        $balance = CapitalBalance::for($party);
 
-        return response()->json(PartyBalance::for($party, $exclude));
+        if ($exclude !== null && $exclude->exists && $exclude->type === CapitalTransactionType::Withdrawal) {
+            $balance = bcadd($balance, (string) $exclude->amount, 2);
+        }
+
+        return response()->json([
+            'balance' => $balance,
+        ]);
     }
 
     /**
@@ -144,8 +151,8 @@ class VoucherController extends Controller
             'party_id' => $request->filled('party_id') ? $request->integer('party_id') : null,
         ]);
 
-        $attributes = $request->validate([
-            'type' => ['required', Rule::enum(VoucherType::class)],
+        return $request->validate([
+            'type' => ['required', Rule::enum(CapitalTransactionType::class)],
             'party_id' => ['required', 'integer', Rule::exists(Party::class, 'id')],
             'date' => ['required', 'date'],
             'notes' => ['nullable', 'string'],
@@ -158,18 +165,18 @@ class VoucherController extends Controller
             'lines.*.holder_name' => ['nullable', 'string', 'max:255'],
             'lines.*.instrument_no' => ['nullable', 'string', 'max:255'],
         ]);
-
-        return $attributes;
     }
 
     /**
      * @return Collection<int, Party>
      */
-    private function partyOptions(?int $includePartyId = null): Collection
+    private function partnerOptions(?int $includePartyId = null): Collection
     {
         return Party::query()
             ->where(function (Builder $query) use ($includePartyId): void {
-                $query->where('is_active', true);
+                $query->where(function (Builder $inner): void {
+                    $inner->where('is_active', true)->where('is_partner', true);
+                });
 
                 if ($includePartyId !== null) {
                     $query->orWhere('id', $includePartyId);

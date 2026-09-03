@@ -25,16 +25,20 @@ final class ProfitAndLossReport
      *     net_label: 'Net Profit'|'Net Loss'
      * }
      */
-    public static function for(?string $from = null, ?string $to = null): array
+    public static function for(?string $from = null, ?string $to = null, bool $excludeClosing = false): array
     {
         $totalsByAccount = JournalEntryLine::query()
-            ->whereHas('journalEntry', function (Builder $query) use ($from, $to): void {
+            ->whereHas('journalEntry', function (Builder $query) use ($from, $to, $excludeClosing): void {
                 if ($from !== null) {
                     $query->whereDate('date', '>=', $from);
                 }
 
                 if ($to !== null) {
                     $query->whereDate('date', '<=', $to);
+                }
+
+                if ($excludeClosing) {
+                    $query->where('is_closing', false);
                 }
             })
             ->selectRaw('account_id, COALESCE(SUM(debit), 0) as debit_total, COALESCE(SUM(credit), 0) as credit_total')

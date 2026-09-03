@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('journal_entries', function (Blueprint $table) {
+        Schema::create('capital_transactions', function (Blueprint $table) {
             $table->id();
-            $table->string('number')->index();
+            $table->string('type')->index();
+            $table->string('number')->unique();
             $table->date('date')->index();
-            $table->text('narration')->nullable();
-            $table->nullableMorphs('journalable');
-            $table->boolean('is_closing')->default(false);
+            $table->foreignId('party_id')->index()->constrained()->restrictOnDelete();
+            $table->decimal('amount', 15, 2);
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('journal_entries');
+        Schema::dropIfExists('capital_transactions');
     }
 };

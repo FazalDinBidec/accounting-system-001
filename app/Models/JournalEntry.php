@@ -18,12 +18,13 @@ use Illuminate\Support\Carbon;
  * @property string|null $narration
  * @property string|null $journalable_type
  * @property int|null $journalable_id
+ * @property bool $is_closing
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Model|null $journalable
  * @property-read Collection<int, JournalEntryLine> $lines
  */
-#[Fillable(['number', 'date', 'narration', 'journalable_type', 'journalable_id'])]
+#[Fillable(['number', 'date', 'narration', 'journalable_type', 'journalable_id', 'is_closing'])]
 class JournalEntry extends Model
 {
     /** @use HasFactory<JournalEntryFactory> */
@@ -36,6 +37,7 @@ class JournalEntry extends Model
     {
         return [
             'date' => 'date',
+            'is_closing' => 'boolean',
         ];
     }
 

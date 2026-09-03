@@ -20,6 +20,8 @@ final class JournalEntryBuilder
 
     private ?Model $journalable = null;
 
+    private bool $isClosing = false;
+
     /**
      * @var list<array{account_id: int, party_id: int|null, debit: string, credit: string, narration: string|null}>
      */
@@ -50,6 +52,13 @@ final class JournalEntryBuilder
     public function journalable(Model $journalable): self
     {
         $this->journalable = $journalable;
+
+        return $this;
+    }
+
+    public function isClosing(bool $isClosing = true): self
+    {
+        $this->isClosing = $isClosing;
 
         return $this;
     }
@@ -124,6 +133,7 @@ final class JournalEntryBuilder
                 'number' => now(),
                 'date' => $this->date,
                 'narration' => $this->narration,
+                'is_closing' => $this->isClosing,
             ]);
 
             if ($this->journalable !== null) {

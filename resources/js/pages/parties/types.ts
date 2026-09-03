@@ -6,6 +6,8 @@ export type Party = {
     phone: string | null;
     address: string | null;
     is_active: boolean;
+    is_partner: boolean;
+    capital_balance?: string | null;
 };
 
 export type PaginatedParties = Paginated<Party>;

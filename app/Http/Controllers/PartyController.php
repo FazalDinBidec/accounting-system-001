@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Party;
+use App\Support\CapitalBalance;
 use App\Support\Toast;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,6 +18,14 @@ class PartyController extends Controller
             'parties' => Party::query()
                 ->latest()
                 ->paginate(10)
+                ->through(function (Party $party): array {
+                    return [
+                        ...$party->toArray(),
+                        'capital_balance' => $party->is_partner
+                            ? CapitalBalance::for($party)
+                            : null,
+                    ];
+                })
                 ->withQueryString(),
         ]);
     }
@@ -56,6 +65,7 @@ class PartyController extends Controller
             $party->saleOrders()->exists()
             || $party->purchaseOrders()->exists()
             || $party->vouchers()->exists()
+            || $party->capitalTransactions()->exists()
             || $party->journalEntryLines()->exists()
         ) {
             Toast::error(__('This party is used on documents or journals.'));
@@ -71,7 +81,7 @@ class PartyController extends Controller
     }
 
     /**
-     * @return array{name: string, phone: string|null, address: string|null, is_active: bool}
+     * @return array{name: string, phone: string|null, address: string|null, is_active: bool, is_partner: bool}
      */
     private function validatedAttributes(Request $request): array
     {
@@ -80,6 +90,7 @@ class PartyController extends Controller
             'phone' => ['nullable', 'string', 'max:30'],
             'address' => ['nullable', 'string'],
             'is_active' => ['required', 'boolean'],
+            'is_partner' => ['required', 'boolean'],
         ]);
     }
 }

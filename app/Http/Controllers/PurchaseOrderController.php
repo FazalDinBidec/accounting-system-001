@@ -8,6 +8,7 @@ use App\Models\PurchaseOrder;
 use App\Models\StockMovement;
 use App\Support\BatchNo;
 use App\Support\DocumentJournal;
+use App\Support\PeriodGuard;
 use App\Support\ProductBatchBook;
 use App\Support\ProductStock;
 use App\Support\Toast;
@@ -76,6 +77,8 @@ class PurchaseOrderController extends Controller
 
     public function destroy(PurchaseOrder $purchaseOrder): RedirectResponse
     {
+        PeriodGuard::assertDateIsPostable($purchaseOrder->date->toDateString());
+
         DB::transaction(function () use ($purchaseOrder): void {
             ProductBatchBook::revertPurchase($purchaseOrder);
             $purchaseOrder->delete();
@@ -144,7 +147,10 @@ class PurchaseOrderController extends Controller
     private function persist(?PurchaseOrder $purchaseOrder, array $attributes): PurchaseOrder
     {
         return DB::transaction(function () use ($purchaseOrder, $attributes): PurchaseOrder {
+            PeriodGuard::assertDateIsPostable($attributes['date']);
+
             if ($purchaseOrder !== null) {
+                PeriodGuard::assertDateIsPostable($purchaseOrder->date->toDateString());
                 ProductBatchBook::revertPurchase($purchaseOrder);
             }
 

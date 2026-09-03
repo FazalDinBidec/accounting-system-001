@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('parties', function (Blueprint $table) {
+        Schema::create('fiscal_period_allocations', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('phone')->nullable();
-            $table->text('address')->nullable();
-            $table->boolean('is_active')->default(true)->index();
-            $table->boolean('is_partner')->default(false)->index();
+            $table->foreignId('fiscal_period_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('party_id')->constrained()->restrictOnDelete();
+            $table->decimal('amount', 15, 2);
             $table->timestamps();
+
+            $table->unique(['fiscal_period_id', 'party_id']);
         });
     }
 
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('parties');
+        Schema::dropIfExists('fiscal_period_allocations');
     }
 };

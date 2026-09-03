@@ -23,6 +23,8 @@ final class SystemAccounts
 
     public const SalesReturn = 'Sales Return';
 
+    public const PartnersCapital = 'Partners Capital';
+
     public static function named(string $name): Account
     {
         $account = Account::query()->where('name', $name)->first();
@@ -67,6 +69,11 @@ final class SystemAccounts
     public static function salesReturn(): Account
     {
         return self::named(self::SalesReturn);
+    }
+
+    public static function partnersCapital(): Account
+    {
+        return self::named(self::PartnersCapital);
     }
 
     public static function parentForMethod(VoucherMethod $method): Account

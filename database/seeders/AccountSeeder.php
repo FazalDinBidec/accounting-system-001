@@ -43,6 +43,7 @@ class AccountSeeder extends Seeder
             ['name' => 'Party Payables', 'type' => AccountType::Liability, 'parent' => null],
             ['name' => 'Tax Payable', 'type' => AccountType::Liability, 'parent' => null],
             ['name' => 'Partners Capital', 'type' => AccountType::Equity, 'parent' => null],
+            ['name' => 'Opening Balance Equity', 'type' => AccountType::Equity, 'parent' => null],
             ['name' => 'Sales', 'type' => AccountType::Income, 'parent' => null],
             ['name' => 'Sales Return', 'type' => AccountType::Income, 'parent' => 'Sales'],
             ['name' => 'Cost of Goods Sold', 'type' => AccountType::Expense, 'parent' => null],

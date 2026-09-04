@@ -67,6 +67,7 @@ class PartyController extends Controller
             || $party->vouchers()->exists()
             || $party->capitalTransactions()->exists()
             || $party->journalEntryLines()->exists()
+            || $party->partyOpenings()->exists()
         ) {
             Toast::error(__('This party is used on documents or journals.'));
 

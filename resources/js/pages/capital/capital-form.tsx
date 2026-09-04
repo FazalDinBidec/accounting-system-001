@@ -396,9 +396,11 @@ export default function CapitalForm({
                             <InputError message={errors.notes} />
                         </div>
 
-                        <Button type="submit" disabled={processing}>
-                            {isEditing ? 'Update transaction' : 'Save transaction'}
-                        </Button>
+                        <div className="flex justify-end gap-2">
+                            <Button type="submit" disabled={processing}>
+                                {isEditing ? 'Update transaction' : 'Save transaction'}
+                            </Button>
+                        </div>
                     </form>
                 </CardContent>
             </Card>

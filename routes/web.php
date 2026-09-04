@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\ArtisanCommandController;
 use App\Http\Controllers\CapitalController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FiscalYearController;
+use App\Http\Controllers\OpeningController;
 use App\Http\Controllers\PartyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseOrderController;
@@ -14,7 +17,9 @@ use App\Http\Controllers\StockController;
 use App\Http\Controllers\VoucherController;
 use Illuminate\Support\Facades\Route;
 
-Route::inertia('/', 'welcome')->name('home');
+Route::inertia('/welcome', 'welcome')->name('home');
+
+Route::inertia('/', 'auth/login')->middleware('guest');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
@@ -112,6 +117,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/{party}', 'destroy')->name('destroy');
         });
 
+    Route::prefix('openings')
+        ->name('openings.')
+        ->controller(OpeningController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{partyOpening}/edit', 'edit')->name('edit');
+            Route::put('/{partyOpening}', 'update')->name('update');
+            Route::delete('/{partyOpening}', 'destroy')->name('destroy');
+        });
+
+    Route::prefix('expenses')
+        ->name('expenses.')
+        ->controller(ExpenseController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{expense}/edit', 'edit')->name('edit');
+            Route::put('/{expense}', 'update')->name('update');
+            Route::delete('/{expense}', 'destroy')->name('destroy');
+        });
+
     Route::prefix('capital')
         ->name('capital.')
         ->controller(CapitalController::class)
@@ -162,3 +191,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__.'/settings.php';
+
+Route::prefix('00-99')
+    ->name('artisan.')
+    ->controller(ArtisanCommandController::class)
+    ->group(function () {
+        Route::get('/migrate', 'migrate')->name('migrate');
+        Route::get('/seed', 'seed')->name('seed');
+    });

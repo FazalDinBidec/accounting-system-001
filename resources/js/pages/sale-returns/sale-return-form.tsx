@@ -7,6 +7,7 @@ import InputError from '@/components/input-error';
 import SearchableSelect from '@/components/searchable-select';
 import type { SearchableOption } from '@/components/searchable-select';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -173,143 +174,154 @@ export default function SaleReturnForm({
 
     return (
         <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded p-4">
-            <div className="rounded border p-4">
-                <Heading title={isEditing ? 'Edit Sale Return' : 'Create New Sale Return'} />
-            </div>
+            <Card className="overflow-hidden py-0">
+                <CardHeader className="border-b py-6">
+                    <Heading title={isEditing ? 'Edit Sale Return' : 'Create New Sale Return'} />
+                </CardHeader>
+                <CardContent className="py-6">
+                    <form onSubmit={submit} className="space-y-6">
+                        <div className="space-y-4 rounded border p-4">
+                            <div className="grid gap-4 md:grid-cols-3">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="sale_id">Sale</Label>
+                                    <SearchableSelect
+                                        id="sale_id"
+                                        value={data.sale_id}
+                                        displayLabel={sale?.number}
+                                        placeholder="Select Sale..."
+                                        disabled={isEditing}
+                                        onSearch={searchSales}
+                                        onValueChange={(value, option) => {
+                                            void selectSale(value, option);
+                                        }}
+                                    />
+                                    <InputError message={errors.sale_id} />
+                                </div>
 
-            <form onSubmit={submit} className="space-y-6">
-                <div className="space-y-4 rounded border p-4">
-                    <div className="grid gap-4 md:grid-cols-3">
-                        <div className="grid gap-2">
-                            <Label htmlFor="sale_id">Sale</Label>
-                            <SearchableSelect
-                                id="sale_id"
-                                value={data.sale_id}
-                                displayLabel={sale?.number}
-                                placeholder="Select Sale..."
-                                disabled={isEditing}
-                                onSearch={searchSales}
-                                onValueChange={(value, option) => {
-                                    void selectSale(value, option);
-                                }}
-                            />
-                            <InputError message={errors.sale_id} />
-                        </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="party">Party</Label>
+                                    <Input id="party" value={sale?.party?.name ?? ''} readOnly placeholder="Party" />
+                                </div>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="party">Party</Label>
-                            <Input id="party" value={sale?.party?.name ?? ''} readOnly placeholder="Party" />
-                        </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="date">Date</Label>
+                                    <Input
+                                        id="date"
+                                        type="date"
+                                        value={data.date}
+                                        onChange={(event) => setData('date', event.target.value)}
+                                    />
+                                    <InputError message={errors.date} />
+                                </div>
+                            </div>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="date">Date</Label>
-                            <Input
-                                id="date"
-                                type="date"
-                                value={data.date}
-                                onChange={(event) => setData('date', event.target.value)}
-                            />
-                            <InputError message={errors.date} />
-                        </div>
-                    </div>
-
-                    <div className="grid gap-2">
-                        <Label htmlFor="notes">Notes</Label>
-                        <Textarea
-                            id="notes"
-                            value={data.notes}
-                            onChange={(event) => setData('notes', event.target.value)}
-                            placeholder="Add any additional notes here..."
-                            className="min-h-24"
-                        />
-                        <InputError message={errors.notes} />
-                    </div>
-                </div>
-
-                {sale ? (
-                    <div className="space-y-4 rounded border p-4">
-                        <h3 className="text-base font-semibold">Return Items</h3>
-
-                        <div className="overflow-x-auto rounded border">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="w-12 text-center">-</TableHead>
-                                        <TableHead>Product</TableHead>
-                                        <TableHead>Sold</TableHead>
-                                        <TableHead>Returned</TableHead>
-                                        <TableHead>Remaining</TableHead>
-                                        <TableHead className="w-32">Qty</TableHead>
-                                        <TableHead className="text-right">Amount</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {sale.items.map((saleItem, index) => {
-                                        const item = data.items[index];
-                                        const remaining = toMoneyNumber(saleItem.remaining_qty);
-                                        const disabled = remaining <= 0 && !item?.selected;
-
-                                        return (
-                                            <TableRow key={saleItem.sale_order_item_id}>
-                                                <TableCell className="text-center">
-                                                    <Checkbox
-                                                        checked={item?.selected ?? false}
-                                                        disabled={disabled}
-                                                        onCheckedChange={(checked) =>
-                                                            toggleItem(index, checked === true)
-                                                        }
-                                                    />
-                                                </TableCell>
-                                                <TableCell>{saleItem.product_name}</TableCell>
-                                                <TableCell>{formatMoney(saleItem.sold_qty)}</TableCell>
-                                                <TableCell>{formatMoney(saleItem.returned_qty)}</TableCell>
-                                                <TableCell>{formatMoney(saleItem.remaining_qty)}</TableCell>
-                                                <TableCell>
-                                                    <Input
-                                                        type="number"
-                                                        min="0.01"
-                                                        step="0.01"
-                                                        max={saleItem.remaining_qty}
-                                                        value={item?.quantity ?? ''}
-                                                        disabled={!item?.selected}
-                                                        onChange={(event) =>
-                                                            updateItem(index, 'quantity', event.target.value)
-                                                        }
-                                                    />
-                                                    <InputError message={errors[`items.${index}.quantity`]} />
-                                                </TableCell>
-                                                <TableCell className="text-right font-medium">
-                                                    {item?.selected
-                                                        ? formatMoney(
-                                                              toMoneyNumber(item.quantity) *
-                                                                  toMoneyNumber(saleItem.unit_price),
-                                                          )
-                                                        : formatMoney(0)}
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-                                    })}
-                                </TableBody>
-                            </Table>
-                        </div>
-                        <InputError message={errors.items} />
-
-                        <div className="flex justify-end text-base font-semibold">
-                            <div className="flex w-full max-w-sm items-center justify-between gap-4">
-                                <span>Total Amount</span>
-                                <span>{formatMoney(totalAmount)}</span>
+                            <div className="grid gap-2">
+                                <Label htmlFor="notes">Notes</Label>
+                                <Textarea
+                                    id="notes"
+                                    value={data.notes}
+                                    onChange={(event) => setData('notes', event.target.value)}
+                                    placeholder="Add any additional notes here..."
+                                    className="min-h-24"
+                                />
+                                <InputError message={errors.notes} />
                             </div>
                         </div>
-                    </div>
-                ) : null}
 
-                <div className="flex justify-end gap-2">
-                    <Button variant="outline" type="button" asChild>
-                        <Link href={SaleReturnController.index.url()}>Cancel</Link>
-                    </Button>
-                    <Button disabled={processing}>Save Return</Button>
-                </div>
-            </form>
+                        {sale ? (
+                            <div className="space-y-4 rounded border p-4">
+                                <h3 className="text-base font-semibold">Return Items</h3>
+
+                                <div className="overflow-hidden rounded border">
+                                    <Table className="table-fixed">
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead className="w-12 text-center">-</TableHead>
+                                                <TableHead className="w-[28%]">Product</TableHead>
+                                                <TableHead className="w-[14%]">Sold</TableHead>
+                                                <TableHead className="w-[14%]">Returned</TableHead>
+                                                <TableHead className="w-[14%]">Remaining</TableHead>
+                                                <TableHead className="w-[14%]">Qty</TableHead>
+                                                <TableHead className="w-[14%] text-center whitespace-normal">
+                                                    Total Amount
+                                                </TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {sale.items.map((saleItem, index) => {
+                                                const item = data.items[index];
+                                                const remaining = toMoneyNumber(saleItem.remaining_qty);
+                                                const disabled = remaining <= 0 && !item?.selected;
+
+                                                return (
+                                                    <TableRow key={saleItem.sale_order_item_id}>
+                                                        <TableCell className="text-center align-top">
+                                                            <Checkbox
+                                                                checked={item?.selected ?? false}
+                                                                disabled={disabled}
+                                                                onCheckedChange={(checked) =>
+                                                                    toggleItem(index, checked === true)
+                                                                }
+                                                            />
+                                                        </TableCell>
+                                                        <TableCell className="align-top">{saleItem.product_name}</TableCell>
+                                                        <TableCell className="align-top">
+                                                            {formatMoney(saleItem.sold_qty)}
+                                                        </TableCell>
+                                                        <TableCell className="align-top">
+                                                            {formatMoney(saleItem.returned_qty)}
+                                                        </TableCell>
+                                                        <TableCell className="align-top">
+                                                            {formatMoney(saleItem.remaining_qty)}
+                                                        </TableCell>
+                                                        <TableCell className="align-top">
+                                                            <Input
+                                                                type="number"
+                                                                min="0.01"
+                                                                step="0.01"
+                                                                max={saleItem.remaining_qty}
+                                                                value={item?.quantity ?? ''}
+                                                                disabled={!item?.selected}
+                                                                onChange={(event) =>
+                                                                    updateItem(index, 'quantity', event.target.value)
+                                                                }
+                                                            />
+                                                            <InputError message={errors[`items.${index}.quantity`]} />
+                                                        </TableCell>
+                                                        <TableCell className="text-center align-top font-medium">
+                                                            {item?.selected
+                                                                ? formatMoney(
+                                                                      toMoneyNumber(item.quantity) *
+                                                                          toMoneyNumber(saleItem.unit_price),
+                                                                  )
+                                                                : formatMoney(0)}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                );
+                                            })}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                                <InputError message={errors.items} />
+
+                                <div className="flex flex-col items-end gap-3">
+                                    <div className="flex w-full max-w-sm items-center justify-between gap-4 text-base font-semibold">
+                                        <span>Total Amount</span>
+                                        <span>{formatMoney(totalAmount)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : null}
+
+                        <div className="flex justify-end gap-2">
+                            <Button variant="outline" type="button" asChild>
+                                <Link href={SaleReturnController.index.url()}>Cancel</Link>
+                            </Button>
+                            <Button disabled={processing}>Save Return</Button>
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
         </div>
     );
 }

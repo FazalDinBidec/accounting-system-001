@@ -1,10 +1,10 @@
 import { Form, Head } from '@inertiajs/react';
-import {
-    index as confirmOptions,
-    store as confirmStore,
-} from '@/actions/Laravel/Passkeys/Http/Controllers/PasskeyConfirmationController';
+// import {
+//     index as confirmOptions,
+//     store as confirmStore,
+// } from '@/actions/Laravel/Passkeys/Http/Controllers/PasskeyConfirmationController';
 import InputError from '@/components/input-error';
-import PasskeyVerify from '@/components/passkey-verify';
+// import PasskeyVerify from '@/components/passkey-verify';
 import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -16,7 +16,7 @@ export default function ConfirmPassword() {
         <>
             <Head title="Confirm password" />
 
-            <PasskeyVerify
+            {/* <PasskeyVerify
                 routes={{
                     options: confirmOptions(),
                     submit: confirmStore(),
@@ -24,7 +24,7 @@ export default function ConfirmPassword() {
                 label="Confirm with passkey"
                 loadingLabel="Confirming..."
                 separator="Or confirm with password"
-            />
+            /> */}
 
             <Form {...store.form()} resetOnSuccess={['password']}>
                 {({ processing, errors }) => (

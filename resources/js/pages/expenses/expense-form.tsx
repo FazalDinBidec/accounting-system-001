@@ -1,8 +1,8 @@
 import { useForm } from '@inertiajs/react';
 import { Plus, Trash2 } from 'lucide-react';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment } from 'react';
 import type { SubmitEvent } from 'react';
-import VoucherController from '@/actions/App/Http/Controllers/VoucherController';
+import ExpenseController from '@/actions/App/Http/Controllers/ExpenseController';
 import FormSelect from '@/components/form-select';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
@@ -12,10 +12,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
-import { dateInputValue, formatMoney, toMoneyNumber } from '@/pages/vouchers/types';
-import type { Voucher, VoucherOption } from '@/pages/vouchers/types';
+import { dateInputValue, formatMoney, toMoneyNumber } from '@/pages/expenses/types';
+import type { Expense, ExpenseOption } from '@/pages/expenses/types';
 
-type FormLine = {
+type ExpenseFormLine = {
+    account_id: string;
+    amount: string;
+    narration: string;
+};
+
+type PaymentFormLine = {
     method: string;
     account_id: string;
     amount: string;
@@ -25,7 +31,15 @@ type FormLine = {
     instrument_no: string;
 };
 
-function emptyLine(): FormLine {
+function emptyExpenseLine(): ExpenseFormLine {
+    return {
+        account_id: '',
+        amount: '',
+        narration: '',
+    };
+}
+
+function emptyPaymentLine(): PaymentFormLine {
     return {
         method: 'cash',
         account_id: '',
@@ -41,97 +55,71 @@ function todayDate(): string {
     return new Date().toISOString().slice(0, 10);
 }
 
-export default function VoucherForm({
-    voucher,
-    parties,
+export default function ExpenseForm({
+    expense,
+    expenseAccounts,
     cashAccounts,
     bankAccounts,
 }: {
-    voucher?: Voucher;
-    parties: VoucherOption[];
-    cashAccounts: VoucherOption[];
-    bankAccounts: VoucherOption[];
+    expense?: Expense;
+    expenseAccounts: ExpenseOption[];
+    cashAccounts: ExpenseOption[];
+    bankAccounts: ExpenseOption[];
 }) {
-    const isEditing = voucher !== undefined;
+    const isEditing = expense !== undefined;
     const { data, setData, post, put, processing, errors } = useForm({
-        type: voucher?.type ?? 'receipt',
-        party_id: voucher ? String(voucher.party_id) : '',
-        date: voucher ? dateInputValue(voucher.date) : todayDate(),
-        notes: voucher?.notes ?? '',
-        lines: voucher?.lines?.map((line) => ({
-            method: line.method,
-            account_id: String(line.account_id),
-            amount: line.amount,
-            bank_name: line.bank_name ?? '',
-            account_no: line.account_no ?? '',
-            holder_name: line.holder_name ?? '',
-            instrument_no: line.instrument_no ?? '',
-        })) ?? [emptyLine()],
+        date: expense ? dateInputValue(expense.date) : todayDate(),
+        notes: expense?.notes ?? '',
+        expense_lines:
+            expense?.expenseLines?.map((line) => ({
+                account_id: String(line.account_id),
+                amount: line.amount,
+                narration: line.narration ?? '',
+            })) ?? [emptyExpenseLine()],
+        payment_lines:
+            expense?.paymentLines?.map((line) => ({
+                method: line.method,
+                account_id: String(line.account_id),
+                amount: line.amount,
+                bank_name: line.bank_name ?? '',
+                account_no: line.account_no ?? '',
+                holder_name: line.holder_name ?? '',
+                instrument_no: line.instrument_no ?? '',
+            })) ?? [emptyPaymentLine()],
     });
 
-    const [balance, setBalance] = useState<{
-        partyId: string;
-        receivable: string;
-        payable: string;
-    } | null>(null);
+    const expenseTotal = data.expense_lines.reduce((sum, line) => sum + toMoneyNumber(line.amount), 0);
+    const paymentTotal = data.payment_lines.reduce((sum, line) => sum + toMoneyNumber(line.amount), 0);
+    const totalsMatch = formatMoney(expenseTotal) === formatMoney(paymentTotal);
 
-    useEffect(() => {
-        if (data.party_id === '') {
-            return;
-        }
-
-        const partyId = data.party_id;
-        const url = VoucherController.partyBalance.url(Number(partyId), {
-            query: voucher === undefined ? {} : { exclude_voucher_id: voucher.id },
-        });
-
-        let cancelled = false;
-
-        void fetch(url, {
-            headers: {
-                Accept: 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-            credentials: 'same-origin',
-        })
-            .then((response) => response.json())
-            .then((payload: { receivable: string; payable: string }) => {
-                if (!cancelled) {
-                    setBalance({
-                        partyId,
-                        receivable: payload.receivable,
-                        payable: payload.payable,
-                    });
-                }
-            })
-            .catch(() => {
-                if (!cancelled) {
-                    setBalance((current) => (current?.partyId === partyId ? null : current));
-                }
-            });
-
-        return () => {
-            cancelled = true;
-        };
-    }, [data.party_id, voucher]);
-
-    const totalAmount = data.lines.reduce((sum, line) => sum + toMoneyNumber(line.amount), 0);
-
-    function accountsFor(method: string): VoucherOption[] {
+    function accountsFor(method: string): ExpenseOption[] {
         return method === 'bank' ? bankAccounts : cashAccounts;
     }
 
-    function updateLine(index: number, field: keyof FormLine, value: string): void {
+    function updateExpenseLine(index: number, field: keyof ExpenseFormLine, value: string): void {
         setData(
-            'lines',
-            data.lines.map((line, lineIndex) => {
+            'expense_lines',
+            data.expense_lines.map((line, lineIndex) => {
+                if (lineIndex !== index) {
+                    return line;
+                }
+
+                return { ...line, [field]: value };
+            }),
+        );
+    }
+
+    function updatePaymentLine(index: number, field: keyof PaymentFormLine, value: string): void {
+        setData(
+            'payment_lines',
+            data.payment_lines.map((line, lineIndex) => {
                 if (lineIndex !== index) {
                     return line;
                 }
 
                 if (field === 'method') {
                     return {
-                        ...emptyLine(),
+                        ...emptyPaymentLine(),
                         method: value,
                     };
                 }
@@ -141,90 +129,49 @@ export default function VoucherForm({
         );
     }
 
-    function addLine(): void {
-        setData('lines', [...data.lines, emptyLine()]);
+    function addExpenseLine(): void {
+        setData('expense_lines', [...data.expense_lines, emptyExpenseLine()]);
     }
 
-    function removeLine(index: number): void {
+    function removeExpenseLine(index: number): void {
         setData(
-            'lines',
-            data.lines.filter((_, lineIndex) => lineIndex !== index),
+            'expense_lines',
+            data.expense_lines.filter((_, lineIndex) => lineIndex !== index),
+        );
+    }
+
+    function addPaymentLine(): void {
+        setData('payment_lines', [...data.payment_lines, emptyPaymentLine()]);
+    }
+
+    function removePaymentLine(index: number): void {
+        setData(
+            'payment_lines',
+            data.payment_lines.filter((_, lineIndex) => lineIndex !== index),
         );
     }
 
     function submit(event: SubmitEvent<HTMLFormElement>): void {
         event.preventDefault();
 
-        if (isEditing && voucher) {
-            put(VoucherController.update.url(voucher));
+        if (isEditing && expense) {
+            put(ExpenseController.update.url(expense));
 
             return;
         }
 
-        post(VoucherController.store.url());
+        post(ExpenseController.store.url());
     }
-
-    const outstandingLabel = data.type === 'payment' ? 'Payable outstanding' : 'Receivable outstanding';
-    const outstandingValue =
-        data.party_id === '' || balance === null || balance.partyId !== data.party_id
-            ? null
-            : data.type === 'payment'
-              ? balance.payable
-              : balance.receivable;
 
     return (
         <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded p-4">
             <Card className="overflow-hidden py-0">
                 <CardHeader className="border-b py-6">
-                    <Heading title={isEditing ? 'Edit Voucher' : 'Create New Voucher'} />
+                    <Heading title={isEditing ? 'Edit Expense' : 'Create Expense'} />
                 </CardHeader>
                 <CardContent className="py-6">
                     <form onSubmit={submit} className="space-y-6">
-                        <div className="grid grid-cols-3 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="type">Type</Label>
-                                {isEditing ? (
-                                    <Input id="type" value={data.type === 'payment' ? 'Payment' : 'Receipt'} disabled />
-                                ) : (
-                                    <FormSelect
-                                        id="type"
-                                        value={data.type}
-                                        onValueChange={(value) => {
-                                            if (value === 'receipt' || value === 'payment') {
-                                                setData('type', value);
-                                            }
-                                        }}
-                                        placeholder="Select type"
-                                        options={[
-                                            { value: 'receipt', label: 'Receipt' },
-                                            { value: 'payment', label: 'Payment' },
-                                        ]}
-                                    />
-                                )}
-                                <InputError message={errors.type} />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="party_id">Party</Label>
-                                <FormSelect
-                                    id="party_id"
-                                    value={data.party_id}
-                                    onValueChange={(value) => setData('party_id', value)}
-                                    placeholder="Select party"
-                                    emptyLabel="Select party"
-                                    options={parties.map((party) => ({
-                                        value: String(party.id),
-                                        label: party.name,
-                                    }))}
-                                />
-                                <InputError message={errors.party_id} />
-                                {outstandingValue !== null ? (
-                                    <p className="text-sm text-muted-foreground">
-                                        {outstandingLabel}: {formatMoney(outstandingValue)}
-                                    </p>
-                                ) : null}
-                            </div>
-
+                        <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="date">Date</Label>
                                 <Input
@@ -237,9 +184,90 @@ export default function VoucherForm({
                             </div>
                         </div>
 
-                        <div className="space-y-8">
-                            <Label>Lines</Label>
-                            <InputError message={errors.lines} />
+                        <div className="space-y-4">
+                            <Label>Expense lines</Label>
+                            <InputError message={errors.expense_lines} />
+
+                            <Table className="table-fixed [&_td]:py-3 [&_th]:py-3">
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-[35%]">Expense account</TableHead>
+                                        <TableHead className="w-[25%]">Amount</TableHead>
+                                        <TableHead className="w-[37%]">Narration</TableHead>
+                                        <TableHead className="w-[3%] text-center" />
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {data.expense_lines.map((line, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell>
+                                                <FormSelect
+                                                    value={line.account_id}
+                                                    onValueChange={(value) => updateExpenseLine(index, 'account_id', value)}
+                                                    placeholder="Select account"
+                                                    emptyLabel="Select account"
+                                                    options={expenseAccounts.map((account) => ({
+                                                        value: String(account.id),
+                                                        label: account.name,
+                                                    }))}
+                                                />
+                                                <InputError message={errors[`expense_lines.${index}.account_id`]} />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    step="0.01"
+                                                    value={line.amount}
+                                                    onChange={(event) =>
+                                                        updateExpenseLine(index, 'amount', event.target.value)
+                                                    }
+                                                />
+                                                <InputError message={errors[`expense_lines.${index}.amount`]} />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Input
+                                                    value={line.narration}
+                                                    onChange={(event) =>
+                                                        updateExpenseLine(index, 'narration', event.target.value)
+                                                    }
+                                                />
+                                                <InputError message={errors[`expense_lines.${index}.narration`]} />
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                <Button
+                                                    type="button"
+                                                    variant="destructive"
+                                                    size="icon"
+                                                    className="size-8"
+                                                    disabled={data.expense_lines.length === 1}
+                                                    onClick={() => removeExpenseLine(index)}
+                                                >
+                                                    <Trash2 />
+                                                    <span className="sr-only">Remove</span>
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+
+                            <Button type="button" onClick={addExpenseLine}>
+                                <Plus />
+                                Add expense line
+                            </Button>
+
+                            <div className="flex justify-end">
+                                <div className="flex w-full max-w-sm items-center justify-between gap-4 text-base font-semibold">
+                                    <span>Expense total</span>
+                                    <span>{formatMoney(expenseTotal)}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <Label>Payment lines</Label>
+                            <InputError message={errors.payment_lines} />
 
                             <Table className="table-fixed [&_td]:py-3 [&_th]:py-3">
                                 <TableHeader>
@@ -251,31 +279,25 @@ export default function VoucherForm({
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {data.lines.map((line, index) => (
+                                    {data.payment_lines.map((line, index) => (
                                         <Fragment key={index}>
                                             <TableRow className={line.method === 'bank' ? 'border-b-0' : undefined}>
                                                 <TableCell>
                                                     <FormSelect
                                                         value={line.method}
-                                                        onValueChange={(value) => updateLine(index, 'method', value)}
+                                                        onValueChange={(value) => updatePaymentLine(index, 'method', value)}
                                                         options={[
-                                                            {
-                                                                value: 'cash',
-                                                                label: 'Cash',
-                                                            },
-                                                            {
-                                                                value: 'bank',
-                                                                label: 'Bank',
-                                                            },
+                                                            { value: 'cash', label: 'Cash' },
+                                                            { value: 'bank', label: 'Bank' },
                                                         ]}
                                                     />
-                                                    <InputError message={errors[`lines.${index}.method`]} />
+                                                    <InputError message={errors[`payment_lines.${index}.method`]} />
                                                 </TableCell>
                                                 <TableCell>
                                                     <FormSelect
                                                         value={line.account_id}
                                                         onValueChange={(value) =>
-                                                            updateLine(index, 'account_id', value)
+                                                            updatePaymentLine(index, 'account_id', value)
                                                         }
                                                         placeholder="Select account"
                                                         emptyLabel="Select account"
@@ -284,7 +306,7 @@ export default function VoucherForm({
                                                             label: account.name,
                                                         }))}
                                                     />
-                                                    <InputError message={errors[`lines.${index}.account_id`]} />
+                                                    <InputError message={errors[`payment_lines.${index}.account_id`]} />
                                                 </TableCell>
                                                 <TableCell>
                                                     <Input
@@ -293,10 +315,10 @@ export default function VoucherForm({
                                                         step="0.01"
                                                         value={line.amount}
                                                         onChange={(event) =>
-                                                            updateLine(index, 'amount', event.target.value)
+                                                            updatePaymentLine(index, 'amount', event.target.value)
                                                         }
                                                     />
-                                                    <InputError message={errors[`lines.${index}.amount`]} />
+                                                    <InputError message={errors[`payment_lines.${index}.amount`]} />
                                                 </TableCell>
                                                 <TableCell className="text-center">
                                                     <Button
@@ -304,8 +326,8 @@ export default function VoucherForm({
                                                         variant="destructive"
                                                         size="icon"
                                                         className="size-8"
-                                                        disabled={data.lines.length === 1}
-                                                        onClick={() => removeLine(index)}
+                                                        disabled={data.payment_lines.length === 1}
+                                                        onClick={() => removePaymentLine(index)}
                                                     >
                                                         <Trash2 />
                                                         <span className="sr-only">Remove</span>
@@ -321,7 +343,7 @@ export default function VoucherForm({
                                                                 <Input
                                                                     value={line.bank_name}
                                                                     onChange={(event) =>
-                                                                        updateLine(
+                                                                        updatePaymentLine(
                                                                             index,
                                                                             'bank_name',
                                                                             event.target.value,
@@ -329,7 +351,7 @@ export default function VoucherForm({
                                                                     }
                                                                 />
                                                                 <InputError
-                                                                    message={errors[`lines.${index}.bank_name`]}
+                                                                    message={errors[`payment_lines.${index}.bank_name`]}
                                                                 />
                                                             </div>
                                                             <div className="space-y-1">
@@ -337,7 +359,7 @@ export default function VoucherForm({
                                                                 <Input
                                                                     value={line.account_no}
                                                                     onChange={(event) =>
-                                                                        updateLine(
+                                                                        updatePaymentLine(
                                                                             index,
                                                                             'account_no',
                                                                             event.target.value,
@@ -345,7 +367,7 @@ export default function VoucherForm({
                                                                     }
                                                                 />
                                                                 <InputError
-                                                                    message={errors[`lines.${index}.account_no`]}
+                                                                    message={errors[`payment_lines.${index}.account_no`]}
                                                                 />
                                                             </div>
                                                             <div className="space-y-1">
@@ -353,7 +375,7 @@ export default function VoucherForm({
                                                                 <Input
                                                                     value={line.holder_name}
                                                                     onChange={(event) =>
-                                                                        updateLine(
+                                                                        updatePaymentLine(
                                                                             index,
                                                                             'holder_name',
                                                                             event.target.value,
@@ -361,7 +383,7 @@ export default function VoucherForm({
                                                                     }
                                                                 />
                                                                 <InputError
-                                                                    message={errors[`lines.${index}.holder_name`]}
+                                                                    message={errors[`payment_lines.${index}.holder_name`]}
                                                                 />
                                                             </div>
                                                             <div className="space-y-1">
@@ -369,7 +391,7 @@ export default function VoucherForm({
                                                                 <Input
                                                                     value={line.instrument_no}
                                                                     onChange={(event) =>
-                                                                        updateLine(
+                                                                        updatePaymentLine(
                                                                             index,
                                                                             'instrument_no',
                                                                             event.target.value,
@@ -377,7 +399,9 @@ export default function VoucherForm({
                                                                     }
                                                                 />
                                                                 <InputError
-                                                                    message={errors[`lines.${index}.instrument_no`]}
+                                                                    message={
+                                                                        errors[`payment_lines.${index}.instrument_no`]
+                                                                    }
                                                                 />
                                                             </div>
                                                         </div>
@@ -389,15 +413,22 @@ export default function VoucherForm({
                                 </TableBody>
                             </Table>
 
-                            <Button type="button" onClick={addLine}>
+                            <Button type="button" onClick={addPaymentLine}>
                                 <Plus />
-                                Add line
+                                Add payment line
                             </Button>
 
                             <div className="flex justify-end">
-                                <div className="flex w-full max-w-sm items-center justify-between gap-4 text-base font-semibold">
-                                    <span>Total</span>
-                                    <span>{formatMoney(totalAmount)}</span>
+                                <div className="flex w-full max-w-sm flex-col gap-2 text-base font-semibold">
+                                    <div className="flex items-center justify-between gap-4">
+                                        <span>Payment total</span>
+                                        <span>{formatMoney(paymentTotal)}</span>
+                                    </div>
+                                    {!totalsMatch ? (
+                                        <p className="text-sm font-normal text-destructive">
+                                            Expense and payment totals must match.
+                                        </p>
+                                    ) : null}
                                 </div>
                             </div>
                         </div>
@@ -413,8 +444,8 @@ export default function VoucherForm({
                         </div>
 
                         <div className="flex justify-end gap-2">
-                            <Button type="submit" disabled={processing}>
-                                {isEditing ? 'Update voucher' : 'Save voucher'}
+                            <Button type="submit" disabled={processing || !totalsMatch}>
+                                {isEditing ? 'Update expense' : 'Save expense'}
                             </Button>
                         </div>
                     </form>

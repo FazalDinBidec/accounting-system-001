@@ -75,8 +75,11 @@ class AccountController extends Controller
             return back();
         }
 
-        if ($account->journalEntryLines()->exists() || $account->voucherLines()->exists()) {
-            Toast::error(__('This account is used on journals or vouchers.'));
+        if ($account->journalEntryLines()->exists()
+            || $account->voucherLines()->exists()
+            || $account->expenseLines()->exists()
+            || $account->expensePaymentLines()->exists()) {
+            Toast::error(__('This account is used on journals, vouchers, or expenses.'));
 
             return back();
         }

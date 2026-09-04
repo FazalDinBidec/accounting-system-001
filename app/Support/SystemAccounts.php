@@ -25,6 +25,12 @@ final class SystemAccounts
 
     public const PartnersCapital = 'Partners Capital';
 
+    public const OpeningBalanceEquity = 'Opening Balance Equity';
+
+    public const GeneralExpense = 'General Expense';
+
+    public const CostOfGoodsSold = 'Cost of Goods Sold';
+
     public static function named(string $name): Account
     {
         $account = Account::query()->where('name', $name)->first();
@@ -74,6 +80,16 @@ final class SystemAccounts
     public static function partnersCapital(): Account
     {
         return self::named(self::PartnersCapital);
+    }
+
+    public static function openingBalanceEquity(): Account
+    {
+        return self::named(self::OpeningBalanceEquity);
+    }
+
+    public static function generalExpense(): Account
+    {
+        return self::named(self::GeneralExpense);
     }
 
     public static function parentForMethod(VoucherMethod $method): Account

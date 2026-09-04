@@ -72,4 +72,28 @@ class Account extends Model
     {
         return $this->hasMany(VoucherLine::class);
     }
+
+    /**
+     * @return HasMany<ExpenseLine, $this>
+     */
+    public function expenseLines(): HasMany
+    {
+        return $this->hasMany(ExpenseLine::class);
+    }
+
+    /**
+     * @return HasMany<ExpensePaymentLine, $this>
+     */
+    public function expensePaymentLines(): HasMany
+    {
+        return $this->hasMany(ExpensePaymentLine::class);
+    }
+
+    /**
+     * @return HasMany<JournalEntryLine, $this>
+     */
+    public function journalEntryLines(): HasMany
+    {
+        return $this->hasMany(JournalEntryLine::class);
+    }
 }

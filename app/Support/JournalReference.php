@@ -2,7 +2,10 @@
 
 namespace App\Support;
 
+use App\Models\CapitalTransaction;
+use App\Models\Expense;
 use App\Models\JournalEntry;
+use App\Models\PartyOpening;
 use App\Models\PurchaseOrder;
 use App\Models\SaleOrder;
 use App\Models\SaleReturn;
@@ -17,7 +20,10 @@ final class JournalReference
         if ($journalable instanceof SaleOrder
             || $journalable instanceof PurchaseOrder
             || $journalable instanceof SaleReturn
-            || $journalable instanceof Voucher) {
+            || $journalable instanceof PartyOpening
+            || $journalable instanceof Voucher
+            || $journalable instanceof CapitalTransaction
+            || $journalable instanceof Expense) {
             return $journalable->number;
         }
 
@@ -46,6 +52,18 @@ final class JournalReference
 
         if ($journalable instanceof Voucher) {
             return $journalable->type->value === 'receipt' ? 'Receipt' : 'Payment';
+        }
+
+        if ($journalable instanceof PartyOpening) {
+            return $journalable->type->value === 'receivable' ? 'Opening Receivable' : 'Opening Payable';
+        }
+
+        if ($journalable instanceof CapitalTransaction) {
+            return $journalable->type->value === 'introduction' ? 'Capital Introduction' : 'Capital Payout';
+        }
+
+        if ($journalable instanceof Expense) {
+            return 'Expense';
         }
 
         return 'Journal';

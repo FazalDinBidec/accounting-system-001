@@ -4,6 +4,7 @@ import {
     FileChartColumn,
     HandCoins,
     Receipt,
+    Scale,
     Landmark,
     LayoutGrid,
     Package,
@@ -11,6 +12,7 @@ import {
     ShoppingCart,
     Undo2,
     Users,
+    Wallet,
     Warehouse,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
@@ -28,7 +30,9 @@ import {
 import { dashboard } from '@/routes';
 import { index as accounts } from '@/routes/accounts';
 import { index as capital } from '@/routes/capital';
+import { index as expenses } from '@/routes/expenses';
 import { index as fiscalYears } from '@/routes/fiscal-years';
+import { index as openings } from '@/routes/openings';
 import { index as parties } from '@/routes/parties';
 import { index as products } from '@/routes/products';
 import { index as purchases } from '@/routes/purchases';
@@ -89,6 +93,16 @@ const navGroups: NavGroup[] = [
                 title: 'Vouchers',
                 href: vouchers(),
                 icon: Receipt,
+            },
+            {
+                title: 'Expenses',
+                href: expenses(),
+                icon: Wallet,
+            },
+            {
+                title: 'Opening Balances',
+                href: openings(),
+                icon: Scale,
             },
             {
                 title: 'Capital Tranx',
